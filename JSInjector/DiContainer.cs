@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using JSInjector.Binding;
+using NUnit.Framework;
 using TestProject;
 
 namespace JSInjector
 {
     public class DiContainer
     {
-        /*public readonly Dictionary<ConcreteIdBinder<>, Type[]> _container = new Dictionary<ConcreteIdBinder, Type[]>();*/
+        private readonly Dictionary<Type, object> _container = new Dictionary<Type, object>();
         public readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
         public readonly Type[] TypesList;
         private readonly List<Type> _types = new List<Type>();
@@ -19,24 +21,50 @@ namespace JSInjector
             TypesList = _types.ToArray();
         }
 
-        public void Instantiate<TContract>()
+        public void Instantiate(DiContainer container)
         {
-            var type = typeof(TContract);
-            var currentObjInfo = BindInfoMap[type];
-            var contractsTypes = currentObjInfo.TypesMap[currentObjInfo.CurrentType].ToArray();
-            var objParams = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null,
-                CallingConventions.HasThis, contractsTypes, null)?.GetParameters();
-            List<object> parameters = new List<object>();
-
-            foreach (var param in objParams)
+            Type type = null;
+            ParameterInfo[] parameterInfos = new ParameterInfo[] { };
+            
+            foreach (var keyValuePair in container.BindInfoMap)
             {
-                var typeOfParam = param.ParameterType;
-                parameters.Add(Activator.CreateInstance(typeOfParam));
+                if (!_types.Contains(keyValuePair.Key))
+                {
+                    Assert.Fail( keyValuePair.Key + "Not binded");
+                    return;
+                }
+                
+                type = keyValuePair.Key;
+                var contractTypes = keyValuePair.Value.TypesMap[type].ToArray();
+                parameterInfos = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null,
+                    CallingConventions.HasThis, contractTypes, null)?.GetParameters();
+                var obj = CreateObj(type, parameterInfos);
+                _container.Add(type, obj);
             }
 
-            var item = Activator.CreateInstance(type, BindingFlags.Instance, parameters);
-            Activator.CreateInstance(type, objParams);
-            var manager = (Manager)item;
+        }
+
+        private Object CreateObj(Type type, ParameterInfo[] parameterInfos)
+        {
+            List<object> parameters = new List<object>();
+            
+
+            try
+            {
+                foreach (var param in parameterInfos)
+                {
+                    var typeOfParam = param.ParameterType;
+                    parameters.Add(Activator.CreateInstance(typeOfParam));
+                }
+                
+                return Activator.CreateInstance(type, parameters.ToArray());
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("Error while building " + type);
+            }
+
+            return null;
         }
 
         public bool CanBind<T>()
@@ -50,6 +78,7 @@ namespace JSInjector
         {
             var type = typeof(TContract);
             var bindInfo = new BindInfo();
+            _types.Add(type);
             bindInfo.TypesMap.Add(type, new List<Type>());
             bindInfo.CurrentType = type;
             BindInfoMap.Add(type, bindInfo);

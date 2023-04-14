@@ -1,7 +1,10 @@
 ﻿namespace TestProject
 {
-    public class Tester
+    public class Tester : ITester
     {
-        
+        public void CreateManager()
+        {
+            
+        }
     }
 }

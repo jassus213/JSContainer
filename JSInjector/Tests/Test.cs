@@ -8,9 +8,7 @@ namespace JSInjector.Tests
         public void TestConstructor()
         {
             var company = new Company();
-            var manager = new Manager(company);
-            Console.WriteLine(manager.GetType().GetConstructors());
-            
+
         }
     }
 }

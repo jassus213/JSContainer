@@ -7,14 +7,10 @@ namespace TestProject
         public int Id { get; set; }
         public Company Company { get; set; }
 
-        public Manager(Company company)
+        public Manager(Company company, ITester tester)
         {
             Company = company;
         }
-
-        public Manager()
-        {
-            
-        }
+        
     }
 }

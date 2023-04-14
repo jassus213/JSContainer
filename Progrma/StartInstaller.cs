@@ -7,7 +7,10 @@ namespace Progrma
     {
         public override void Install()
         {
-            Container.Bind<Company>();
+            Container.Bind<Manager>();
+            Container.Bind<Company>().To<Manager>();
+            Container.Bind<Tester>().To<Manager>();
+            Container.Instantiate(Container);
         }
     }
 }
