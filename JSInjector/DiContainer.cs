@@ -4,21 +4,21 @@ using System.Linq;
 using System.Reflection;
 using JSInjector.Binding;
 using NUnit.Framework;
-using TestProject;
 
 namespace JSInjector
 {
     public class DiContainer
     {
         private readonly Dictionary<Type, object> _container = new Dictionary<Type, object>();
+        public readonly Dictionary<Type, KeyValuePair<bool, object>> ContainerInfo = new Dictionary<Type, KeyValuePair<bool, object>>();
         public readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
-        public readonly Type[] TypesList;
-        private readonly List<Type> _types = new List<Type>();
-        private readonly List<Type> _contractTypes = new List<Type>();
+        public readonly List<Type> AllowedTypes = new List<Type>();
+
+        private readonly ObjCreator _objCreator;
 
         public DiContainer()
         {
-            TypesList = _types.ToArray();
+            _objCreator = new ObjCreator(this);
         }
 
         public void Instantiate(DiContainer container)
@@ -26,9 +26,10 @@ namespace JSInjector
             Type type = null;
             ParameterInfo[] parameterInfos = new ParameterInfo[] { };
             
+            
             foreach (var keyValuePair in container.BindInfoMap)
             {
-                if (!_types.Contains(keyValuePair.Key))
+                if (!AllowedTypes.Contains(keyValuePair.Key))
                 {
                     Assert.Fail( keyValuePair.Key + "Not binded");
                     return;
@@ -36,65 +37,67 @@ namespace JSInjector
                 
                 type = keyValuePair.Key;
                 var contractTypes = keyValuePair.Value.TypesMap[type].ToArray();
-                parameterInfos = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null,
-                    CallingConventions.HasThis, contractTypes, null)?.GetParameters();
-                var obj = CreateObj(type, parameterInfos);
+                parameterInfos = _objCreator.GetParamsInfo(type, contractTypes, CallingConventions.HasThis);
+                var obj = _objCreator.TryCreateObj(type, parameterInfos);
                 _container.Add(type, obj);
             }
-
         }
 
-        private Object CreateObj(Type type, ParameterInfo[] parameterInfos)
-        {
-            List<object> parameters = new List<object>();
-            
+        
 
-            try
-            {
-                foreach (var param in parameterInfos)
-                {
-                    var typeOfParam = param.ParameterType;
-                    parameters.Add(Activator.CreateInstance(typeOfParam));
-                }
-                
-                return Activator.CreateInstance(type, parameters.ToArray());
-            }
-            catch (Exception e)
-            {
-                Assert.Fail("Error while building " + type);
-            }
-
-            return null;
-        }
-
-        public bool CanBind<T>()
-        {
-            if (typeof(T).GetConstructors().Length == 0)
-                return false;
-            return true;
-        }
+        
 
         public ConcreteIdBinder<TContract> Bind<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = new BindInfo();
-            _types.Add(type);
-            bindInfo.TypesMap.Add(type, new List<Type>());
-            bindInfo.CurrentType = type;
-            BindInfoMap.Add(type, bindInfo);
-            return new ConcreteIdBinder<TContract>(this, bindInfo);
+            var bindInfo = GetBindInfo(type);
+            InitializeInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
+            return new ConcreteIdBinder<TContract>(this, bindInfo, _objCreator);
+        }
+
+        public TContract Resolve<TContract>()
+        {
+            var type = typeof(TContract);
+            var containerInfo = ContainerInfo[type];
+            if (containerInfo.Key)
+                return (TContract)containerInfo.Value;
+            
+            Assert.Fail(type + "Doesnt exist");
+            return (TContract)containerInfo.Value;
+        }
+
+        public void BindSelfTo<TContract>()
+        {
+            var type = typeof(TContract);
+            var bindInfo = GetBindInfo(type);
+            var parameters = _objCreator.GetParamsInfo(type, AllowedTypes.ToArray(), CallingConventions.Any);
+            InitializeInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
+            var obj = _objCreator.TryCreateObj<TContract>();
+        }
+
+        private void InitializeInfo(Type type, BindInfo bindInfo, KeyValuePair<bool, object> keyValuePair)
+        {
+            if (!ContainerInfo.ContainsKey(type))
+            {
+                var tupleObj = keyValuePair;
+                ContainerInfo.Add(type, tupleObj);
+                AllowedTypes.Add(type);
+                BindInfoMap.Add(type, bindInfo);
+            }
+        }
+
+        private BindInfo GetBindInfo(Type type)
+        {
+            if (BindInfoMap.ContainsKey(type))
+                return BindInfoMap[type];
+
+            return new BindInfo(type);
         }
 
         public BindInfo GetBindInfo<T>()
         {
             var currentObj = BindInfoMap[typeof(T)];
             return currentObj;
-        }
-
-        public TConcrete To<TConcrete>() where TConcrete : new()
-        {
-            _types.Add(typeof(TConcrete));
-            return new TConcrete();
         }
     }
 }

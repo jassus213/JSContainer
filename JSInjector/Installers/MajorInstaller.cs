@@ -2,10 +2,13 @@
 {
     public abstract class MajorInstaller : IInstaller
     {
-        private readonly DiContainer _container = new DiContainer();
+        private DiContainer _container = new DiContainer();
 
-        protected DiContainer Container => _container;
+        public DiContainer Container => _container;
 
-        public abstract void Install();
+        public virtual void Install()
+        {
+           Container.Bind<DiContainer>().FromResolve(_container);
+        }
     }
 }

@@ -33,6 +33,8 @@
     </PropertyGroup>
     <ItemGroup>
       <Compile Include="Company.cs" />
+      <Compile Include="InjectManager.cs" />
+      <Compile Include="InjectProvider.cs" />
       <Compile Include="ITester.cs" />
       <Compile Include="Manager.cs" />
       <Compile Include="Tester.cs" />

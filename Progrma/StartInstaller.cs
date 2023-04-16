@@ -1,5 +1,7 @@
-﻿using JSInjector.Installers;
-using TestProject;
+﻿using System;
+using JSInjector.Installers;
+using JSInjector.Tests;
+using NUnitTests;
 
 namespace Progrma
 {
@@ -7,9 +9,9 @@ namespace Progrma
     {
         public override void Install()
         {
-            Container.Bind<Manager>();
-            Container.Bind<Company>().To<Manager>();
-            Container.Bind<Tester>().To<Manager>();
+            base.Install();
+            Container.BindSelfTo<Test>();
+            Container.BindSelfTo<Foo>();
             Container.Instantiate(Container);
         }
     }

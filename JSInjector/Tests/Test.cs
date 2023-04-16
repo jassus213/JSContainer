@@ -1,14 +1,13 @@
 ﻿using System;
-using TestProject;
 
 namespace JSInjector.Tests
 {
     public class Test
     {
-        public void TestConstructor()
+        public readonly DiContainer DiContainer;
+        public Test(DiContainer diContainer)
         {
-            var company = new Company();
-
+            DiContainer = diContainer;
         }
     }
 }

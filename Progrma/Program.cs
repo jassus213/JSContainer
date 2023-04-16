@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Reflection;
 using JSInjector;
-using TestProject;
 
 
 namespace Progrma
@@ -11,8 +10,7 @@ namespace Progrma
     {
         public static void Main(string[] args)
         {
-            var installer = new StartInstaller();
-            installer.Install();
+            
         }
     }
 }
