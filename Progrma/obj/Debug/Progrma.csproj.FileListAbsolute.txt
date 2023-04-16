@@ -37,3 +37,8 @@ C:/Users/JaSSuS/Projects/JSInjector/Progrma/obj/Debug/Progrma.pdb
 /Users/JaSSuS/Projects/JSInjector/Progrma/obj/Debug/Progrma.csproj.CopyComplete
 /Users/JaSSuS/Projects/JSInjector/Progrma/obj/Debug/Progrma.exe
 /Users/JaSSuS/Projects/JSInjector/Progrma/obj/Debug/Progrma.pdb
+C:\Users\JaSSuS\Projects\JSInjector\Progrma\obj\Debug\Progrma.csproj.AssemblyReference.cache
+C:\Users\JaSSuS\Projects\JSInjector\Progrma\obj\Debug\Progrma.csproj.SuggestedBindingRedirects.cache
+C:\Users\JaSSuS\Projects\JSInjector\Progrma\obj\Debug\Progrma.csproj.CoreCompileInputs.cache
+C:\Users\JaSSuS\Projects\JSInjector\Progrma\obj\Debug\Progrma.exe
+C:\Users\JaSSuS\Projects\JSInjector\Progrma\obj\Debug\Progrma.pdb

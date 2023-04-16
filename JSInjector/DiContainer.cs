@@ -9,10 +9,9 @@ namespace JSInjector
 {
     public class DiContainer
     {
-        private readonly Dictionary<Type, object> _container = new Dictionary<Type, object>();
-        public readonly Dictionary<Type, KeyValuePair<bool, object>> ContainerInfo = new Dictionary<Type, KeyValuePair<bool, object>>();
-        public readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
-        public readonly List<Type> AllowedTypes = new List<Type>();
+        internal readonly Dictionary<Type, KeyValuePair<bool, object>> ContainerInfo = new Dictionary<Type, KeyValuePair<bool, object>>();
+        internal readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
+        internal readonly List<Type> AllowedTypes = new List<Type>();
 
         private readonly ObjCreator _objCreator;
 
@@ -39,7 +38,6 @@ namespace JSInjector
                 var contractTypes = keyValuePair.Value.TypesMap[type].ToArray();
                 parameterInfos = _objCreator.GetParamsInfo(type, contractTypes, CallingConventions.HasThis);
                 var obj = _objCreator.TryCreateObj(type, parameterInfos);
-                _container.Add(type, obj);
             }
         }
 
@@ -63,7 +61,8 @@ namespace JSInjector
                 return (TContract)containerInfo.Value;
             
             Assert.Fail(type + "Doesnt exist");
-            return (TContract)containerInfo.Value;
+            return (TContract)containerInfo.Value;        
+
         }
 
         public void BindSelfTo<TContract>()

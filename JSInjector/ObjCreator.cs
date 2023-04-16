@@ -61,15 +61,38 @@ namespace JSInjector
             return null;
         }
 
-        public T TryCreateObj<T>()
+        public TContract TryCreateObj<TContract>()
         {
-            var test = typeof(T).GetConstructors().First();
-            var parm = test.GetParameters();
-            var obj = Expression.Lambda<Func<T>>(
-                Expression.New(test)
-            ).Compile();
+            var constructorInfo = typeof(TContract).GetConstructors().First();
+            var parameterInfos = constructorInfo.GetParameters();
+            var parameters = GetParameters(parameterInfos);
+            var body = Expression.New(constructorInfo, parameters);
+            var func = Expression.Lambda<Func<ParameterInfo[], TContract>>(body, parameters.ToArray()).Compile();
+            var obj = func(parameterInfos);
+
+            return obj;
+        }
+
+        private IEnumerable<ParameterExpression> GetParameters(ParameterInfo[] requiredParameters)
+        {
+            var parametersInfo = new List<ParameterExpression>();
             
-            return (T)obj.Target;
+            foreach (var parameter in requiredParameters)
+            {
+                var parameterType = parameter.ParameterType;
+                if (!_diContainer.ContainerInfo[parameterType].Key)
+                {
+                    var param = Expression.Parameter(parameterType);
+                    parametersInfo.Add(param);
+                }
+                else
+                {
+                    var param = Expression.Parameter(parameterType);
+                    parametersInfo.Add(param);
+                }
+            }
+
+            return parametersInfo.ToArray();
         }
 
         public Object TryCreateObj(Type type)

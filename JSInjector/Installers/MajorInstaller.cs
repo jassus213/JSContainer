@@ -2,8 +2,7 @@
 {
     public abstract class MajorInstaller : IInstaller
     {
-        private DiContainer _container = new DiContainer();
-
+        private readonly DiContainer _container = new DiContainer();
         public DiContainer Container => _container;
 
         public virtual void Install()
