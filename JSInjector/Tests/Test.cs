@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JSInjector.Tests
+﻿namespace JSInjector.Tests
 {
     public class Test
     {

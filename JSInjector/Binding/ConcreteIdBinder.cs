@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JSInjector.Binding.BindInfo;
 using NUnit.Framework;
 
 namespace JSInjector.Binding
@@ -6,16 +7,14 @@ namespace JSInjector.Binding
     public class ConcreteIdBinder<TContract>
     {
         private readonly DiContainer _diContainer;
-        private readonly BindInfo _bindInfo;
-        private readonly ObjCreator _objCreator;
-        
-        public ConcreteIdBinder(DiContainer diContainer, BindInfo bindInfo, ObjCreator objCreator)
+        private readonly BindInfo.BindInfo _bindInfo;
+
+        public ConcreteIdBinder(DiContainer diContainer, BindInfo.BindInfo bindInfo)
         {
             _diContainer = diContainer;
             _bindInfo = bindInfo;
-            _objCreator = objCreator;
         }
-        
+
         public void To<TConcrete>()
         {
             var type = typeof(TConcrete);
@@ -24,17 +23,25 @@ namespace JSInjector.Binding
                 Assert.Fail(type + "Not Binded");
                 return;
             }
+
             var tConcreteInfo = _bindInfo;
-            tConcreteInfo.TypesMap[type].Add(typeof(TContract));
             tConcreteInfo.ContractsTypes.Add(typeof(TContract));
         }
 
-        public void FromResolve(object obj)
+        public void WithArguments<TArg1>(TArg1 argument1)
+        {
+
+        }
+
+        public void WithArguments<TArg1, TArg2>(TArg1 argument1)
+        {
+
+        }
+
+        public void FromResolve(object obj, BindTypes bindType)
         {
             var type = obj.GetType();
-            if (_diContainer.ContainerInfo.ContainsKey(type))
-                _diContainer.ContainerInfo.Remove(type);
-            _diContainer.ContainerInfo.Add(type, new KeyValuePair<bool, object>(true, obj));
+            _diContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, object>(true, obj));
         }
     }
 }

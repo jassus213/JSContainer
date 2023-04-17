@@ -10,26 +10,26 @@ namespace NUnitTests
         public void Setup()
         {
         }
+        
 
         [Test]
-        public void Test1()
+        public void TestBindSelf()
         {
-            var installer = new StartInstaller();
+            var installer = new BindSelfToTestInstaller();
             installer.Install();
-            
-            var container = installer.Container.Resolve<DiContainer>();
             var test = installer.Container.Resolve<Test>();
             var foo = installer.Container.Resolve<Foo>();
-            Assert.AreEqual(container, test.DiContainer);
-            Assert.AreEqual(test.DiContainer, foo.DiContainer);
+            var bar = installer.Container.Resolve<Bar>();
+            var container = installer.Container.Resolve<DiContainer>();
+            Assert.AreEqual(test.DiContainer, container);
+            Assert.AreEqual(container, foo.DiContainer);
         }
 
         [Test]
-        public void Test2()
+        public void TestBindInterfacesTo()
         {
-            var installer = new StartInstaller();
+            var installer = new BindInterfacesToTestInstaller();
             installer.Install();
-            var test = installer.Container.Resolve<Test>();
         }
     }
 }

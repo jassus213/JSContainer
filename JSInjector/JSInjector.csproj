@@ -12,6 +12,7 @@
         <AssemblyName>JSInjector</AssemblyName>
         <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
+        <LangVersion>9</LangVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
         <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,20 +34,32 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="Binding\BindInfo.cs" />
+      <Compile Include="Binding\BindInfo\BindInfo.cs" />
+      <Compile Include="Binding\BindInfo\BindInfoManager.cs" />
+      <Compile Include="Binding\BindInfo\BindTypes.cs" />
+      <Compile Include="Binding\BindInfo\FactoryBindInfo.cs" />
       <Compile Include="Binding\ConcreteIdBinder.cs" />
+      <Compile Include="Binding\FactoryConcreteIdBinder.cs" />
       <Compile Include="Contracts\IContainer.cs" />
       <Compile Include="DiContainer.cs" />
+      <Compile Include="Factories\IFactory.cs" />
+      <Compile Include="FactoryInitializer.cs" />
       <Compile Include="Installers\IInstaller.cs" />
       <Compile Include="Installers\MajorInstaller.cs" />
-      <Compile Include="ObjCreator.cs" />
+      <Compile Include="JSExceptions\JSExceptions.cs" />
+      <Compile Include="JSExceptions\JSWarnings.cs" />
+      <Compile Include="ObjectInitializer.cs" />
+      <Compile Include="Tests\Bar.cs" />
       <Compile Include="Tests\Foo.cs" />
+      <Compile Include="Tests\IFoo.cs" />
       <Compile Include="Tests\Test.cs" />
+      <Compile Include="Utils\InstanceUtil.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
         <HintPath>..\packages\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
       </Reference>
+      <Reference Include="System" />
     </ItemGroup>
     <ItemGroup>
       <None Include="packages.config" />
