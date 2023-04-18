@@ -43,35 +43,24 @@ namespace JSInjector
             return Expression.Lambda<Func<TArg1, TArg2, TConcrete>>(Expression.New(constructorInfo, parameterExpressions), parameterExpressions).Compile();
         }
 
-        internal static Func<TConcrete> CreateInstance<TConcrete>()
+        internal static Func<TConcrete> CreateInstance<TConcrete>(ConstructorInfo constructorInfo, DiContainer diContainer)
         {
             return null;
         }
 
-        internal static TConcrete CreateInstance<TConcrete, TArg1>(ConstructorInfo constructorInfo, DiContainer diContainer)
+        private static TConcrete CreateInstance<TArg1, TConcrete>(ConstructorInfo constructorInfo, DiContainer diContainer)
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = CreateFunc<TArg1, TConcrete>(constructorInfo, parameters);
-            var arguments = DiContainerUtil.SearchInstances(diContainer, parameters);
-            var argument = arguments.First();
-            var obj = func.Invoke((TArg1)argument);
+            var obj = func.Invoke((TArg1)DiContainerUtil.SearchInstance<TArg1>(diContainer));
             return obj;
         }
-        internal static TConcrete CreateInstance<TConcrete, TArg1, TArg2>(ConstructorInfo constructorInfo, DiContainer diContainer)
+        
+        private static TConcrete CreateInstance<TArg1, TArg2, TConcrete>(ConstructorInfo constructorInfo, DiContainer diContainer)
         {
-            var dictionary = new Dictionary<int, object>();
-            TArg1 arg1 = default;
-            TArg2 arg2 = default;
-            dictionary.Add(1, typeof(TArg1));
-            dictionary.Add(2, typeof(TArg2));
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = CreateFunc<TArg1, TArg2, TConcrete>(constructorInfo, parameters);
-            var arguments = DiContainerUtil.SearchInstances(diContainer, parameters).ToArray();
-            for (int i = 0; i < arguments.Length; i++)
-            {
-                dictionary[i] = arguments[i];
-            }
-            var obj = func.Invoke(arg1, arg2);
+            var obj = func.Invoke((TArg1)DiContainerUtil.SearchInstance<TArg1>(diContainer), (TArg2)DiContainerUtil.SearchInstance<TArg2>(diContainer));
             return obj;
         }
         

@@ -11,6 +11,5 @@ public class BindInterfacesToTestInstaller : MajorInstaller
         Container.BindSelfTo<Test>();
         Container.BindSelfTo<Bar>();
         Container.BindSelfTo<Foo>();
-        Container.Initialize();
     }
 }

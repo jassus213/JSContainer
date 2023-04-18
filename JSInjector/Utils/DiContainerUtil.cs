@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using JSInjector.Binding.BindInfo;
 using JSInjector.JSExceptions;
 
@@ -8,6 +10,34 @@ namespace JSInjector.Utils
 {
     internal static class DiContainerUtil
     {
+        internal static object SearchInstance<TConcrete>(DiContainer container)
+        {
+            var type = typeof(TConcrete);
+            
+            if (container.ContainerInfo[type].Key)
+                return container.ContainerInfo[type].Value;
+            
+            var baseMethods = typeof(ObjectInitializer).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+            var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == container.BindInfoMap[type].ParameterExpressions.Count && x.Name == "CreateInstance");
+            var genericMethod = currentMethod.MakeGenericMethod(GenericArgumentsMap(type, container.BindInfoMap[type].ParameterExpressions));
+            var obj = genericMethod.Invoke(null, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(type), container });
+            return obj;
+        }
+        
+        private static Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
+        {
+            var result = new List<Type>();
+
+            foreach (var argument in arguments)
+            {
+                result.Add(argument.Type);
+            }
+            
+            result.Add(type);
+            return result.ToArray();
+        }
+        
+        
         internal static IReadOnlyCollection<object> SearchInstances(DiContainer currentContainer, IEnumerable<ParameterExpression> parametersExpressions)
         {
             var result = new List<object>();

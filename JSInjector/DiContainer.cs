@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding;
 using JSInjector.Binding.BindInfo;
@@ -35,7 +36,7 @@ namespace JSInjector
                         case InstanceType.Default:
                             var baseMethod = typeof(ObjectInitializer).GetMethod("CreateInstance");
                             var genericMethod = baseMethod.MakeGenericMethod(keyValuePair.Key);
-                            genericMethod.Invoke(null, new []{this});
+                            genericMethod.Invoke(null, new []{ this });
                             break;
                         case InstanceType.Factory:
                             /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>
@@ -49,15 +50,42 @@ namespace JSInjector
             BindQueue.Clear();
         }
 
-        public void TestInitialize(Type type)
+        public void TestInitialize()
         {
-            var baseMethods = typeof(ObjectInitializer).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-            var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[type].ParameterExpressions.Count);
-            var genericArguments = new List<Type>();
-            genericArguments.Add(type);
-            genericArguments.Add(BindInfoMap[type].ParameterExpressions.First().Type);
-            var genericMethod = currentMethod.MakeGenericMethod(genericArguments.ToArray());
-            var func = genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(type), this });
+            foreach (var keyValuePair in BindQueue)
+            {
+                if (!keyValuePair.Value.Key)
+                {
+                    switch (BindInfoMap[keyValuePair.Key].InstanceType)
+                    {
+                        case InstanceType.Default:
+                            var baseMethods = typeof(ObjectInitializer).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+                            var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
+                            var genericMethod = currentMethod.MakeGenericMethod(GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions));
+                            var func = genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
+                            break;
+                        case InstanceType.Factory:
+                            /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>
+                                x.Name == "Create" && x.GetGenericArguments().Length ==
+                                FactoryBindInfoMap[keyValuePair.Key].GenericArguments).ToArray().First();*/
+                            break;
+                    }
+                }
+            }
+           
+        }
+
+        private Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
+        {
+            var result = new List<Type>();
+
+            foreach (var argument in arguments)
+            {
+                result.Add(argument.Type);
+            }
+            
+            result.Add(type);
+            return result.ToArray();
         }
 
         public TContract Resolve<TContract>()
