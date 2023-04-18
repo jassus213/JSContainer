@@ -8,6 +8,9 @@ public class BindInterfacesToTestInstaller : MajorInstaller
     public override void Install()
     {
         base.Install();
-        Container.BindInterfacesTo<Foo>();
+        Container.BindSelfTo<Test>();
+        Container.BindSelfTo<Bar>();
+        Container.BindSelfTo<Foo>();
+        Container.Initialize();
     }
 }

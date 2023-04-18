@@ -51,8 +51,10 @@
       <Compile Include="ObjectInitializer.cs" />
       <Compile Include="Tests\Bar.cs" />
       <Compile Include="Tests\Foo.cs" />
+      <Compile Include="Tests\IBar.cs" />
       <Compile Include="Tests\IFoo.cs" />
       <Compile Include="Tests\Test.cs" />
+      <Compile Include="Utils\DiContainerUtil.cs" />
       <Compile Include="Utils\InstanceUtil.cs" />
     </ItemGroup>
     <ItemGroup>

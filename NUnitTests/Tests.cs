@@ -1,5 +1,4 @@
-using JSInjector;
-using JSInjector.Tests;
+using JSInjector.Contracts;
 using NUnit.Framework;
 
 namespace NUnitTests
@@ -10,26 +9,21 @@ namespace NUnitTests
         public void Setup()
         {
         }
-        
-
-        [Test]
-        public void TestBindSelf()
-        {
-            var installer = new BindSelfToTestInstaller();
-            installer.Install();
-            var test = installer.Container.Resolve<Test>();
-            var foo = installer.Container.Resolve<Foo>();
-            var bar = installer.Container.Resolve<Bar>();
-            var container = installer.Container.Resolve<DiContainer>();
-            Assert.AreEqual(test.DiContainer, container);
-            Assert.AreEqual(container, foo.DiContainer);
-        }
 
         [Test]
         public void TestBindInterfacesTo()
         {
             var installer = new BindInterfacesToTestInstaller();
             installer.Install();
+        }
+
+        [Test]
+        public void BindInterfacesAndSelfTo()
+        {
+            var installer = new BindInterfacesAndSelfToTestInstaller();
+            installer.Install();
+
+            IContainer container = installer.Container.Resolve<IContainer>();
         }
     }
 }

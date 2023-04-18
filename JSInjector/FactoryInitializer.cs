@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Linq;
 using System.Linq.Expressions;
 using JSInjector.Utils;
@@ -47,7 +47,7 @@ namespace JSInjector
                     throw new InvalidOperationException($"Constructor can't be found for type '{type.Name}'");
                 }
 
-                var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(new[] { typeArg1 });
+                var parameters = InstanceUtil.ParametersUtil.Map(new[] { typeArg1 });
 
                 var expression = Expression.New(constructor, parameters);
                 var expressionBlock = Expression.Block(type, expression);
@@ -72,7 +72,7 @@ namespace JSInjector
                     throw new InvalidOperationException($"Constructor can't be found for type '{type.Name}'");
                 }
 
-                var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(new[] { typeArg1, typeArg2 });
+                var parameters = InstanceUtil.ParametersUtil.Map(new[] { typeArg1, typeArg2 });
                 
                 var expression = Expression.New(constructor, parameters);
                 var expressionBlock = Expression.Block(type, expression);
@@ -81,4 +81,4 @@ namespace JSInjector
             }
         }
     }
-}
+}*/

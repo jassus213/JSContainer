@@ -3,13 +3,13 @@ using JSInjector.Tests;
 
 namespace NUnitTests;
 
-public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
+public class GitHubIntroduce : MajorInstaller
 {
     public override void Install()
     {
         base.Install();
-        Container.BindInterfacesAndSelfTo<Test>();
-        Container.BindInterfacesAndSelfTo<Bar>();
+        Container.BindSelfTo<Bar>();
+        Container.BindSelfTo<Test>();
         Container.Initialize();
     }
 }

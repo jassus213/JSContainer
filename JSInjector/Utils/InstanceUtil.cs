@@ -11,7 +11,23 @@ namespace JSInjector.Utils
     {
         internal static class ParametersUtil
         {
-            internal static IEnumerable<ParameterExpression> GetParametersExpression(Type[] requiredParameters)
+            internal static bool HasCircularDependency(Type type, IEnumerable<ParameterExpression> parameterExpressions)
+            {
+                foreach (var param in parameterExpressions)
+                {
+                    var parametersOfParam = GetParametersExpression(param.Type).ToArray();
+                    var map = Map(new[] { type }).ToArray().First();
+                    if (parametersOfParam.Where(x => x.Type == map.Type).ToArray().Length != 0)
+                    {
+                        JsExceptions.BindException.CircularDependency(type, param.Type);
+                        return true;
+                    }
+                }
+
+                return false;
+            }   
+            
+            internal static IEnumerable<ParameterExpression> Map(Type[] requiredParameters)
             {
                 var result = new List<ParameterExpression>();
             
@@ -25,14 +41,30 @@ namespace JSInjector.Utils
                 return result;
             }
             
-            internal static ParameterInfo[] GetParamsInfo(Type type, Type[] contractTypes, CallingConventions callingConventions)
+            internal static ParameterInfo[] GetParametersInfo(Type type, Type[] contractTypes, CallingConventions callingConventions)
             {
-                var parameterInfos = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null,
+                var parameterInfos = type.GetConstructor(BindingFlags.Default, null,
                     callingConventions, contractTypes, null)?.GetParameters();
 
                 return parameterInfos;
             }
-            
+
+            internal static ParameterInfo[] GetParametersInfo(Type constructorType)
+            {
+                return GetParametersInfo(ConstructorUtils.GetConstructor(constructorType));
+            }
+
+            internal static ParameterInfo[] GetParametersInfo(ConstructorInfo constructorInfo)
+            {
+                return constructorInfo.GetParameters();
+            }
+
+            internal static IEnumerable<ParameterExpression> GetParametersExpression(Type constructorType)
+            {
+                return GetParametersExpression(GetParametersInfo(ConstructorUtils.GetConstructor(constructorType))
+                    .Select(x => x.ParameterType));
+            }
+
             internal static IEnumerable<ParameterExpression> GetParametersExpression(IEnumerable<Type> requiredParameters)
             {
                 var result = new List<ParameterExpression>();
@@ -65,15 +97,24 @@ namespace JSInjector.Utils
                 return type.GetConstructors().First();
             }
 
-            internal static ConstructorInfo GetConstructor(Type type, int requiredParams)
+            internal static ConstructorInfo GetConstructor(Type type, int requiredParamsCount)
             {
-                var constructors = type.GetConstructors().Where(x => x.GetParameters().Length == requiredParams).ToArray();
+                var constructors = type.GetConstructors().Where(x => x.GetParameters().Length == requiredParamsCount).ToArray();
                 if (constructors.Length > 1)
                     JsWarnings.ConstructorWarnings.LotConstructorReturnedWarning(constructors.Count(), constructors.ToArray());
                 if (constructors.Length == 0)
                     JsExceptions.ConstructorException.ConstructorIsNullException(type);
                 
                 return constructors.First();
+            }
+
+            internal static ConstructorInfo GetConstructor(Type type, IEnumerable<Type> requiredParams)
+            {
+                var constructorInfo = type.GetConstructor(requiredParams.ToArray());
+                if (constructorInfo == null)
+                    JsExceptions.ConstructorException.ConstructorIsNullException(type);
+                
+                return constructorInfo;
             }
         }
 

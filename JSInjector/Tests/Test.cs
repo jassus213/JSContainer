@@ -3,8 +3,11 @@
     public class Test
     {
         public readonly DiContainer DiContainer;
-        public Test(DiContainer diContainer)
+        public readonly IBar Bar;
+        
+        public Test(IBar bar, DiContainer diContainer)
         {
+            Bar = bar;
             DiContainer = diContainer;
         }
     }

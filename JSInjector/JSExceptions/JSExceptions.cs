@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace JSInjector.JSExceptions
@@ -16,6 +17,13 @@ namespace JSInjector.JSExceptions
             public static void AlreadyBindedException(Type type)
             {
                 var message = $"{type} Already Binded";
+                Assert.Fail(message);
+            }
+
+            public static void CircularDependency(Type instanceType,
+                Type parameterType)
+            {
+                var message = $"Circular Dependency {instanceType} and {parameterType}";
                 Assert.Fail(message);
             }
         }

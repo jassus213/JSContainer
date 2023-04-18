@@ -2,11 +2,11 @@
 {
     public class Bar
     {
-        private readonly Foo _foo;
-        
-        public Bar(Foo foo)
+        public readonly DiContainer DiContainer;
+
+        public Bar(DiContainer diContainer)
         {
-            _foo = foo;
+            DiContainer = diContainer;
         }
     }
 }

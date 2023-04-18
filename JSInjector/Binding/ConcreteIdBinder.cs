@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JSInjector.Binding.BindInfo;
+using JSInjector.Utils;
 using NUnit.Framework;
 
 namespace JSInjector.Binding
