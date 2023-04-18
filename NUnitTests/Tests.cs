@@ -22,8 +22,6 @@ namespace NUnitTests
         {
             var installer = new BindInterfacesAndSelfToTestInstaller();
             installer.Install();
-
-            IContainer container = installer.Container.Resolve<IContainer>();
         }
     }
 }

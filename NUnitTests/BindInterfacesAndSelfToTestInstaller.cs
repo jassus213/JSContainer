@@ -10,6 +10,6 @@ public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
         base.Install();
         Container.BindInterfacesAndSelfTo<Test>();
         Container.BindInterfacesAndSelfTo<Bar>();
-        Container.Initialize();
+        Container.TestInitialize(typeof(Bar));
     }
 }

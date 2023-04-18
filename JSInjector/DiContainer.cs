@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using JSInjector.Binding;
 using JSInjector.Binding.BindInfo;
 using JSInjector.Factories;
@@ -45,6 +47,17 @@ namespace JSInjector
             }
 
             BindQueue.Clear();
+        }
+
+        public void TestInitialize(Type type)
+        {
+            var baseMethods = typeof(ObjectInitializer).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+            var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[type].ParameterExpressions.Count);
+            var genericArguments = new List<Type>();
+            genericArguments.Add(type);
+            genericArguments.Add(BindInfoMap[type].ParameterExpressions.First().Type);
+            var genericMethod = currentMethod.MakeGenericMethod(genericArguments.ToArray());
+            var func = genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(type), this });
         }
 
         public TContract Resolve<TContract>()
