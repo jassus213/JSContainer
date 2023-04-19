@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding;
 using JSInjector.Binding.BindInfo;
+using JSInjector.DiFactories;
 using JSInjector.Factories;
 using JSInjector.JSExceptions;
 using JSInjector.Utils;
@@ -23,69 +24,28 @@ namespace JSInjector
 
         internal readonly Queue<KeyValuePair<Type, KeyValuePair<bool, object>>> BindQueue =
             new Queue<KeyValuePair<Type, KeyValuePair<bool, object>>>();
-
+        
 
         public void Initialize()
         {
-            foreach (var keyValuePair in BindQueue)
+            foreach (var keyValuePair in BindQueue.Where(keyValuePair => !keyValuePair.Value.Key))
             {
-                if (!keyValuePair.Value.Key)
+                switch (BindInfoMap[keyValuePair.Key].InstanceType)
                 {
-                    switch (BindInfoMap[keyValuePair.Key].InstanceType)
-                    {
-                        case InstanceType.Default:
-                            var baseMethod = typeof(ObjectInitializer).GetMethod("CreateInstance");
-                            var genericMethod = baseMethod.MakeGenericMethod(keyValuePair.Key);
-                            genericMethod.Invoke(null, new []{ this });
-                            break;
-                        case InstanceType.Factory:
-                            /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>
+                    case InstanceType.Default:
+                        var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+                        var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
+                        var genericMethod = currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters.GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions));
+                        var obj= genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
+                        this.ReWriteInstanceInfo(obj.GetType(), BindInfoMap[obj.GetType()], new KeyValuePair<bool, object>(true, obj));
+                        break;
+                    case InstanceType.Factory:
+                        /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>
                                 x.Name == "Create" && x.GetGenericArguments().Length ==
                                 FactoryBindInfoMap[keyValuePair.Key].GenericArguments).ToArray().First();*/
-                            break;
-                    }
+                        break;
                 }
             }
-
-            BindQueue.Clear();
-        }
-
-        public void TestInitialize()
-        {
-            foreach (var keyValuePair in BindQueue)
-            {
-                if (!keyValuePair.Value.Key)
-                {
-                    switch (BindInfoMap[keyValuePair.Key].InstanceType)
-                    {
-                        case InstanceType.Default:
-                            var baseMethods = typeof(ObjectInitializer).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-                            var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
-                            var genericMethod = currentMethod.MakeGenericMethod(GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions));
-                            var func = genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
-                            break;
-                        case InstanceType.Factory:
-                            /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>
-                                x.Name == "Create" && x.GetGenericArguments().Length ==
-                                FactoryBindInfoMap[keyValuePair.Key].GenericArguments).ToArray().First();*/
-                            break;
-                    }
-                }
-            }
-           
-        }
-
-        private Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
-        {
-            var result = new List<Type>();
-
-            foreach (var argument in arguments)
-            {
-                result.Add(argument.Type);
-            }
-            
-            result.Add(type);
-            return result.ToArray();
         }
 
         public TContract Resolve<TContract>()
@@ -159,6 +119,7 @@ namespace JSInjector
 
         private FactoryConcreteBinderId<TFactory> BindFactory<TFactory>(FactoryBindInfo factoryBindInfo)
         {
+            
             this.InitializeFactoryInfoMap(factoryBindInfo.FactoryType, factoryBindInfo);
             return new FactoryConcreteBinderId<TFactory>(this, factoryBindInfo);
         }

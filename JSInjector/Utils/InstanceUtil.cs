@@ -80,6 +80,22 @@ namespace JSInjector.Utils
                 return result;
             }
         }
+        
+        internal static class GenericParameters
+        {
+            internal static Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
+            {
+                var result = new List<Type>();
+
+                foreach (var argument in arguments)
+                {
+                    result.Add(argument.Type);
+                }
+            
+                result.Add(type);
+                return result.ToArray();
+            }
+        }
 
         internal static class ContractsUtil
         {

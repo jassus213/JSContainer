@@ -48,6 +48,7 @@ namespace JSInjector.JSExceptions
             public static void IsWrongParamsCountException(Type type, int requiredParametersCount)
             {
                 var message = $"{type} Constructor params not equals required parameters - {requiredParametersCount}";
+                Assert.Fail(message);
             }
         }
     }

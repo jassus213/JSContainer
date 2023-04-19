@@ -1,4 +1,4 @@
-using JSInjector.Contracts;
+using System.Diagnostics;
 using NUnit.Framework;
 
 namespace NUnitTests
@@ -20,8 +20,12 @@ namespace NUnitTests
         [Test]
         public void BindInterfacesAndSelfTo()
         {
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
             var installer = new BindInterfacesAndSelfToTestInstaller();
             installer.Install();
+            stopwatch.Stop();
+            Debug.WriteLine("Time to Finish Build " + stopwatch.Elapsed);
         }
     }
 }
