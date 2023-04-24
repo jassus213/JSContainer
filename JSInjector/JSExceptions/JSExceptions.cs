@@ -26,6 +26,12 @@ namespace JSInjector.JSExceptions
                 var message = $"Circular Dependency {instanceType} and {parameterType}";
                 Assert.Fail(message);
             }
+
+            public static void ContractNotBindedToInstance(Type instanceType, Type contractType)
+            {
+                var message = $"{instanceType} has not contract : {contractType}";
+                Assert.Fail(message);
+            }
         }
 
         public static class ResolveException

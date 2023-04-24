@@ -6,31 +6,49 @@ using System.Reflection;
 using JSInjector.Binding.BindInfo;
 using JSInjector.DiFactories;
 using JSInjector.JSExceptions;
+using JSInjector.Utils;
 
-namespace JSInjector.Utils
+namespace JSInjector
 {
     internal static class DiContainerManager
     {
         internal static object SearchInstance<TConcrete>(DiContainer container)
         {
             var type = typeof(TConcrete);
+            var currentType = type;
+            
+            if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
+            {
+                currentType = container.ContractsInfo[type].Last();
 
-            if (container.ContainerInfo[type].Key)
-                return container.ContainerInfo[type].Value;
+                if (!container.BindInfoMap.ContainsKey(currentType))
+                {   
+                    JsExceptions.BindException.NotBindedException(currentType);
+                }
+                
+                var bindInfo = container.BindInfoMap[currentType];
+                
+                if (!bindInfo.ContractsTypes.Contains(type))
+                    JsExceptions.BindException.ContractNotBindedToInstance(currentType, type);
+            }
+            
+            if (container.ContainerInfo[currentType].Key)
+                return container.ContainerInfo[currentType].Value;
 
             if (InstanceUtil.ParametersUtil.HasCircularDependency(type,
-                    InstanceUtil.ParametersUtil.GetParametersExpression(type)))
+                    InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
                 return null;
-            
+
+            //Create Instance
             var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
             var currentMethod = baseMethods.First(x =>
-                x.GetGenericArguments().Length - 1 == container.BindInfoMap[type].ParameterExpressions.Count &&
+                x.GetGenericArguments().Length - 1 == container.BindInfoMap[currentType].ParameterExpressions.Count &&
                 x.Name == "CreateInstance");
             var genericMethod =
-                currentMethod.MakeGenericMethod(GenericArgumentsMap(type,
-                    container.BindInfoMap[type].ParameterExpressions));
+                currentMethod.MakeGenericMethod(GenericArgumentsMap(currentType,
+                    container.BindInfoMap[currentType].ParameterExpressions));
             var obj = genericMethod.Invoke(null,
-                new object[] { InstanceUtil.ConstructorUtils.GetConstructor(type), container });
+                new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
             return obj;
         }
 
@@ -63,7 +81,7 @@ namespace JSInjector.Utils
             KeyValuePair<bool, object> keyValuePair)
         {
             currentContainer.BindQueue.Dequeue();
-            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default);
+            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default, currentContainer);
             ReWriteContainerInfo(currentContainer, type, keyValuePair);
             ReWriteBindInfo(currentContainer, type, bindInfo);
         }
@@ -87,7 +105,7 @@ namespace JSInjector.Utils
             if (container.BindInfoMap.ContainsKey(type))
                 return container.BindInfoMap[type];
 
-            return new BindInfo(type, bindType, instanceType);
+            return new BindInfo(type, bindType, instanceType, container);
         }
 
         private static void ReWriteBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo)

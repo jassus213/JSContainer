@@ -1,8 +1,6 @@
-﻿
-using System.Diagnostics;
-using JSInjector.Installers;
+﻿using JSInjector.Installers;
 using JSInjector.Tests;
-using NUnit.Framework;
+
 
 namespace NUnitTests;
 
@@ -12,6 +10,7 @@ public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
     {
         base.Install();
         Container.BindInterfacesAndSelfTo<Test>();
+        Container.BindInterfacesAndSelfTo<Foo>();
         Container.BindInterfacesAndSelfTo<Bar>();
         Container.Initialize();
     }

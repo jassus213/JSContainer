@@ -37,11 +37,13 @@
       <Compile Include="Binding\BindInfo\BindInfo.cs" />
       <Compile Include="Binding\BindInfo\BindInfoManager.cs" />
       <Compile Include="Binding\BindInfo\BindTypes.cs" />
+      <Compile Include="Binding\BindInfo\ConcreteIdLifeCycle.cs" />
       <Compile Include="Binding\BindInfo\FactoryBindInfo.cs" />
       <Compile Include="Binding\ConcreteIdBinder.cs" />
       <Compile Include="Binding\FactoryConcreteIdBinder.cs" />
       <Compile Include="Contracts\IContainer.cs" />
       <Compile Include="DiContainer.cs" />
+      <Compile Include="DiContainerManager.cs" />
       <Compile Include="DiFactories\FuncFactory.cs" />
       <Compile Include="DiFactories\InstanceFactory.cs" />
       <Compile Include="Factories\IFactory.cs" />
@@ -55,7 +57,6 @@
       <Compile Include="Tests\IBar.cs" />
       <Compile Include="Tests\IFoo.cs" />
       <Compile Include="Tests\Test.cs" />
-      <Compile Include="Utils\DiContainerUtil.cs" />
       <Compile Include="Utils\InstanceUtil.cs" />
     </ItemGroup>
     <ItemGroup>

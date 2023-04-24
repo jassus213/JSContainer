@@ -6,6 +6,7 @@ namespace JSInjector.Binding.BindInfo
 {
     public class BindInfo
     {
+        private readonly DiContainer _currentContainer;
         internal List<ParameterExpression> ParameterExpressions => _parameterExpressions;
         internal readonly InstanceType InstanceType;
         internal readonly BindTypes BindType;
@@ -14,11 +15,12 @@ namespace JSInjector.Binding.BindInfo
         private readonly List<ParameterExpression> _parameterExpressions = new List<ParameterExpression>();
         private readonly BindInfoManager _bindInfoManager;
 
-        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType)
+        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType, DiContainer currentContainer)
         {
             CurrentType = currentType;
             BindType = bindType;
             InstanceType = instanceType;
+            _currentContainer = currentContainer;
             _bindInfoManager = new BindInfoManager(this);
             Initialize();
         }
@@ -30,13 +32,13 @@ namespace JSInjector.Binding.BindInfo
                 case BindTypes.Default:
                     break;
                 case BindTypes.SelfTo:
-                    _bindInfoManager.BindSelfTo();
+                    _bindInfoManager.BindSelfTo(_currentContainer);
                     break;
                 case BindTypes.InterfacesAndSelfTo:
-                    _bindInfoManager.BindInterfacesAndSelfTo();
+                    _bindInfoManager.BindInterfacesAndSelfTo(_currentContainer);
                     break;
                 case BindTypes.InterfacesTo:
-                    _bindInfoManager.BindInterfacesTo();
+                    _bindInfoManager.BindInterfacesTo(_currentContainer);
                     break;
             }
         }

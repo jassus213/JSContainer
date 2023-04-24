@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding;
 using JSInjector.Binding.BindInfo;
@@ -16,6 +15,8 @@ namespace JSInjector
     {
         internal readonly Dictionary<Type, KeyValuePair<bool, object>> ContainerInfo =
             new Dictionary<Type, KeyValuePair<bool, object>>();
+
+        internal readonly Dictionary<Type, IEnumerable<Type>> ContractsInfo = new Dictionary<Type, IEnumerable<Type>>();
 
         internal readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
 
@@ -35,9 +36,8 @@ namespace JSInjector
                     case InstanceType.Default:
                         var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
                         var currentMethod = baseMethods.First(x => x.GetGenericArguments().Length - 1 == BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
-                        var genericMethod = currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters.GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions));
+                        var genericMethod = currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters.GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions).ToArray());
                         var obj= genericMethod.Invoke(this, new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
-                        this.ReWriteInstanceInfo(obj.GetType(), BindInfoMap[obj.GetType()], new KeyValuePair<bool, object>(true, obj));
                         break;
                     case InstanceType.Factory:
                         /*var baseMethodFactory = typeof(FactoryInitializer).GetMethods().Where(x =>

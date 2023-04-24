@@ -1,14 +1,19 @@
+using System;
+
 namespace JSInjector.Tests
 {
     public class Foo : IFoo
     {
         public readonly DiContainer DiContainer;
-        public readonly Test Test;
 
-        public Foo(DiContainer diContainer, Test test)
+        public Foo(DiContainer diContainer)
         {
             DiContainer = diContainer;
-            Test = test;
+        }
+
+        public void Test()
+        {
+            Console.WriteLine("Test");
         }
     }
 }

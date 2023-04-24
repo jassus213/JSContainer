@@ -34,7 +34,7 @@ namespace JSInjector.Binding
 
         }
 
-        public void WithArguments<TArg1, TArg2>(TArg1 argument1)
+        public void WithArguments<TArg1, TArg2>(TArg1 arg1, TArg2 arg2)
         {
 
         }

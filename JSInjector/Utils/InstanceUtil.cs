@@ -27,7 +27,7 @@ namespace JSInjector.Utils
                 return false;
             }   
             
-            internal static IEnumerable<ParameterExpression> Map(Type[] requiredParameters)
+            internal static IReadOnlyCollection<ParameterExpression> Map(Type[] requiredParameters)
             {
                 var result = new List<ParameterExpression>();
             
@@ -41,7 +41,7 @@ namespace JSInjector.Utils
                 return result;
             }
             
-            internal static ParameterInfo[] GetParametersInfo(Type type, Type[] contractTypes, CallingConventions callingConventions)
+            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(Type type, Type[] contractTypes, CallingConventions callingConventions)
             {
                 var parameterInfos = type.GetConstructor(BindingFlags.Default, null,
                     callingConventions, contractTypes, null)?.GetParameters();
@@ -49,23 +49,23 @@ namespace JSInjector.Utils
                 return parameterInfos;
             }
 
-            internal static ParameterInfo[] GetParametersInfo(Type constructorType)
+            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(Type constructorType)
             {
                 return GetParametersInfo(ConstructorUtils.GetConstructor(constructorType));
             }
 
-            internal static ParameterInfo[] GetParametersInfo(ConstructorInfo constructorInfo)
+            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(ConstructorInfo constructorInfo)
             {
                 return constructorInfo.GetParameters();
             }
 
-            internal static IEnumerable<ParameterExpression> GetParametersExpression(Type constructorType)
+            internal static IReadOnlyCollection<ParameterExpression> GetParametersExpression(Type constructorType)
             {
                 return GetParametersExpression(GetParametersInfo(ConstructorUtils.GetConstructor(constructorType))
-                    .Select(x => x.ParameterType));
+                    .Select(x => x.ParameterType)).ToArray();
             }
 
-            internal static IEnumerable<ParameterExpression> GetParametersExpression(IEnumerable<Type> requiredParameters)
+            internal static IReadOnlyCollection<ParameterExpression> GetParametersExpression(IEnumerable<Type> requiredParameters)
             {
                 var result = new List<ParameterExpression>();
                 var parametersArray = requiredParameters.ToArray();
@@ -83,7 +83,7 @@ namespace JSInjector.Utils
         
         internal static class GenericParameters
         {
-            internal static Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
+            internal static IReadOnlyCollection<Type> GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
             {
                 var result = new List<Type>();
 
@@ -99,7 +99,7 @@ namespace JSInjector.Utils
 
         internal static class ContractsUtil
         {
-            internal static IEnumerable<Type> GetContractsExpression(Type type)
+            internal static IReadOnlyCollection<Type> GetContractsExpression(Type type)
             {
                 var contracts = type.GetInterfaces();
                 return contracts;
