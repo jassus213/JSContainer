@@ -9,7 +9,7 @@ using JSInjector.JSExceptions;
 
 namespace JSInjector.Utils
 {
-    internal static class DiContainerUtil
+    internal static class DiContainerManager
     {
         internal static object SearchInstance<TConcrete>(DiContainer container)
         {
