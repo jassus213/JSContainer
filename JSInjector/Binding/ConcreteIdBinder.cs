@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JSInjector.Binding.BindInfo;
-using JSInjector.Utils;
 using NUnit.Framework;
+using LifeCycle = JSInjector.Binding.BindInfo.LifeCycle;
 
 namespace JSInjector.Binding
 {
@@ -29,20 +29,22 @@ namespace JSInjector.Binding
             tConcreteInfo.ContractsTypes.Add(typeof(TContract));
         }
 
-        public void WithArguments<TArg1>(TArg1 argument1)
+        public ConcreteIdLifeCycle<TContract> WithArguments<TArg1>(TArg1 argument1)
         {
-
+            return new ConcreteIdLifeCycle<TContract>(_diContainer);
         }
 
-        public void WithArguments<TArg1, TArg2>(TArg1 arg1, TArg2 arg2)
+        public ConcreteIdLifeCycle<TContract> WithArguments<TArg1, TArg2>(TArg1 arg1, TArg2 arg2)
         {
-
+            return new ConcreteIdLifeCycle<TContract>(_diContainer);
         }
 
-        public void FromResolve(object obj, BindTypes bindType)
+        public ConcreteIdLifeCycle<TContract> FromResolve(object obj, BindTypes bindType = BindTypes.Default)
         {
             var type = obj.GetType();
-            _diContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, object>(true, obj));
+            _diContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, object>(true, obj),
+                LifeCycle.Default);
+            return new ConcreteIdLifeCycle<TContract>(_diContainer);
         }
     }
 }

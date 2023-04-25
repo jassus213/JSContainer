@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding.BindInfo;
 using JSInjector.DiFactories;
@@ -16,53 +15,62 @@ namespace JSInjector
         {
             var type = typeof(TConcrete);
             var currentType = type;
-            
+            BindInfo bindInfo = null;
+
             if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
             {
                 currentType = container.ContractsInfo[type].Last();
 
                 if (!container.BindInfoMap.ContainsKey(currentType))
-                {   
+                {
                     JsExceptions.BindException.NotBindedException(currentType);
                 }
                 
-                var bindInfo = container.BindInfoMap[currentType];
+                bindInfo = container.BindInfoMap[currentType];
                 
                 if (!bindInfo.ContractsTypes.Contains(type))
                     JsExceptions.BindException.ContractNotBindedToInstance(currentType, type);
             }
             
-            if (container.ContainerInfo[currentType].Key)
+            if (type.IsClass && !type.IsAbstract)
+                bindInfo = container.BindInfoMap[currentType];
+
+            if (container.ContainerInfo[currentType].Key && bindInfo!.LifeCycle == LifeCycle.Singleton)
                 return container.ContainerInfo[currentType].Value;
 
             if (InstanceUtil.ParametersUtil.HasCircularDependency(type,
                     InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
                 return null;
 
-            //Create Instance
+            if (bindInfo!.LifeCycle == LifeCycle.Transient || bindInfo.LifeCycle == LifeCycle.Scoped)
+            {
+                var genericMethod = FindMethod(container, currentType);
+                var obj = genericMethod.Invoke(null,
+                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
+                return obj;
+            }
+            
+            if (bindInfo!.LifeCycle == LifeCycle.Singleton && !container.ContainerInfo[currentType].Key)
+            {
+                var genericMethod = FindMethod(container, currentType);
+                var obj = genericMethod.Invoke(null,
+                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
+                return obj;
+            }
+
+            return null;
+        }
+
+        private static MethodInfo FindMethod(DiContainer container, Type currentType)
+        {
             var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
             var currentMethod = baseMethods.First(x =>
                 x.GetGenericArguments().Length - 1 == container.BindInfoMap[currentType].ParameterExpressions.Count &&
                 x.Name == "CreateInstance");
             var genericMethod =
-                currentMethod.MakeGenericMethod(GenericArgumentsMap(currentType,
-                    container.BindInfoMap[currentType].ParameterExpressions));
-            var obj = genericMethod.Invoke(null,
-                new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
-            return obj;
-        }
-
-        private static Type[] GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
-        {
-            var result = new List<Type>();
-
-            foreach (var argument in arguments)
-            {
-                result.Add(argument.Type);
-            }
-
-            result.Add(type);
-            return result.ToArray();
+                currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters.GenericArgumentsMap(currentType,
+                    container.BindInfoMap[currentType].ParameterExpressions).ToArray());
+            return genericMethod;
         }
 
         internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
@@ -78,10 +86,10 @@ namespace JSInjector
         }
 
         internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindTypes bindTypes,
-            KeyValuePair<bool, object> keyValuePair)
+            KeyValuePair<bool, object> keyValuePair, LifeCycle lifeCycle)
         {
             currentContainer.BindQueue.Dequeue();
-            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default, currentContainer);
+            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default, currentContainer, lifeCycle);
             ReWriteContainerInfo(currentContainer, type, keyValuePair);
             ReWriteBindInfo(currentContainer, type, bindInfo);
         }
@@ -100,12 +108,12 @@ namespace JSInjector
         }
 
         internal static BindInfo GetBindInfo(this DiContainer container, Type type, BindTypes bindType,
-            InstanceType instanceType)
+            InstanceType instanceType, LifeCycle lifeCycle)
         {
             if (container.BindInfoMap.ContainsKey(type))
                 return container.BindInfoMap[type];
 
-            return new BindInfo(type, bindType, instanceType, container);
+            return new BindInfo(type, bindType, instanceType, container, lifeCycle);
         }
 
         private static void ReWriteBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo)

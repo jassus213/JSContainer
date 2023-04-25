@@ -1,4 +1,5 @@
 ﻿using JSInjector.Binding;
+using JSInjector.Factories;
 
 namespace JSInjector.Contracts
 {
@@ -8,8 +9,8 @@ namespace JSInjector.Contracts
         ConcreteIdBinder<TContract> Bind<TContract>();
         void BindInterfacesTo<TContract>();
         void BindSelfTo<TContract>();
-        FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>();
-        FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TArgs, TResult>();
+        FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>() where TFactory : IFactory;
+        FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TArgs, TResult>() where TFactory : IFactory where TArgs : struct;
 
     }
 }

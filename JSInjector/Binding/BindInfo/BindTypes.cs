@@ -13,4 +13,12 @@
         InterfacesTo,
         InterfacesAndSelfTo
     }
+
+    public enum LifeCycle
+    {
+        Default,
+        Singleton,
+        Scoped,
+        Transient
+    }
 }

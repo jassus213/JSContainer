@@ -9,9 +9,10 @@ public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
     public override void Install()
     {
         base.Install();
-        Container.BindInterfacesAndSelfTo<Test>();
-        Container.BindInterfacesAndSelfTo<Foo>();
-        Container.BindInterfacesAndSelfTo<Bar>();
+        Container.BindInterfacesAndSelfTo<Test>().AsSingleton();
+        Container.BindInterfacesAndSelfTo<Test1>().AsSingleton();
+        Container.BindInterfacesAndSelfTo<Foo>().AsSingleton();
+        Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
         Container.Initialize();
     }
 }

@@ -7,6 +7,7 @@ namespace JSInjector.Binding.BindInfo
     public class BindInfo
     {
         private readonly DiContainer _currentContainer;
+        internal LifeCycle LifeCycle;
         internal List<ParameterExpression> ParameterExpressions => _parameterExpressions;
         internal readonly InstanceType InstanceType;
         internal readonly BindTypes BindType;
@@ -15,12 +16,13 @@ namespace JSInjector.Binding.BindInfo
         private readonly List<ParameterExpression> _parameterExpressions = new List<ParameterExpression>();
         private readonly BindInfoManager _bindInfoManager;
 
-        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType, DiContainer currentContainer)
+        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType, DiContainer currentContainer, LifeCycle lifeCycle)
         {
             CurrentType = currentType;
             BindType = bindType;
             InstanceType = instanceType;
             _currentContainer = currentContainer;
+            LifeCycle = lifeCycle;
             _bindInfoManager = new BindInfoManager(this);
             Initialize();
         }

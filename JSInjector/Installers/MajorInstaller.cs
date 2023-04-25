@@ -14,12 +14,11 @@ namespace JSInjector.Installers
 
         public MajorInstaller()
         {
-            
         }
 
         public virtual void Install()
         {
-           Container.Bind<DiContainer>().FromResolve(_container, BindTypes.Default);
+            Container.Bind<DiContainer>().FromResolve(_container, BindTypes.InterfacesAndSelfTo).AsSingleton();
         }
     }
 }
