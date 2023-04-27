@@ -45,6 +45,7 @@
       <Compile Include="Contracts\IInitializer.cs" />
       <Compile Include="DiContainer.cs" />
       <Compile Include="DiContainerManager.cs" />
+      <Compile Include="DiContainerManagerExtensions.cs" />
       <Compile Include="DiFactories\FuncFactory.cs" />
       <Compile Include="DiFactories\InstanceFactory.cs" />
       <Compile Include="Factories\Factory.cs" />
@@ -62,6 +63,7 @@
       <Compile Include="Tests\Test1.cs" />
       <Compile Include="Tests\TestFactory.cs" />
       <Compile Include="Utils\InstanceUtil.cs" />
+      <Compile Include="Utils\LifeCycleUtil.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">

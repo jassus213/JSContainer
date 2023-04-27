@@ -16,7 +16,8 @@ namespace JSInjector.Binding.BindInfo
         private readonly List<ParameterExpression> _parameterExpressions = new List<ParameterExpression>();
         private readonly BindInfoManager _bindInfoManager;
 
-        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType, DiContainer currentContainer, LifeCycle lifeCycle)
+        public BindInfo(Type currentType, BindTypes bindType, InstanceType instanceType, DiContainer currentContainer,
+            LifeCycle lifeCycle)
         {
             CurrentType = currentType;
             BindType = bindType;

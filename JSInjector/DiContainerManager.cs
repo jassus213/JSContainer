@@ -11,11 +11,77 @@ namespace JSInjector
 {
     internal static class DiContainerManager
     {
-        internal static object SearchInstance<TConcrete>(DiContainer container)
+        internal static object SearchInstance<TInstance, TConcrete>(DiContainer container)
         {
-            var type = typeof(TConcrete);
+            var type = typeof(TInstance);
             var currentType = type;
             BindInfo bindInfo = null;
+
+            if (IsInterface(currentType, container))
+            {
+                currentType = container.ContractsInfo[type].Last();
+
+                bindInfo = container.BindInfoMap[currentType];
+                
+                if (!bindInfo.ContractsTypes.Contains(type))
+                    JsExceptions.BindException.ContractNotBindedToInstance(type, currentType);
+            }
+            else
+            {
+                bindInfo = container.BindInfoMap[currentType];
+            }
+
+            if (InstanceUtil.ParametersUtil.HasCircularDependency(type,
+                    InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
+                return null;
+
+            if (bindInfo!.LifeCycle == LifeCycle.Singleton &&
+                LifeCycleUtil.IsSingletonInstanced(container, currentType))
+            {
+                return container.ContainerInfo[currentType].Value;
+            }
+
+            if (bindInfo!.LifeCycle == LifeCycle.Singleton && !LifeCycleUtil.IsSingletonInstanced(container, currentType))
+            {
+                var genericMethod = FindMethod(container, currentType);
+                var obj = genericMethod.Invoke(null,
+                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
+                return obj;
+            }
+
+
+            if (bindInfo!.LifeCycle == LifeCycle.Scoped &&
+                LifeCycleUtil.IsScopedInstanced(container, currentType, typeof(TConcrete)))
+            {
+                var instance = container.ScopedInstance[currentType][typeof(TConcrete)];
+                return instance;
+            }
+
+            if (bindInfo!.LifeCycle == LifeCycle.Scoped &&
+                !LifeCycleUtil.IsScopedInstanced(container, currentType, typeof(TConcrete)))
+            {
+                var genericMethod = FindMethod(container, currentType);
+                var obj = genericMethod.Invoke(null,
+                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
+                container.ScopedInstance[currentType].Add(typeof(TConcrete), obj);
+                return obj;
+            }
+
+
+            if (bindInfo!.LifeCycle == LifeCycle.Transient)
+            {
+                var genericMethod = FindMethod(container, currentType);
+                var obj = genericMethod.Invoke(null,
+                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
+                return obj;
+            }
+
+            return null;
+        }
+
+        private static bool IsInterface(Type type, DiContainer container)
+        {
+            var currentType = type;
 
             if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
             {
@@ -26,39 +92,10 @@ namespace JSInjector
                     JsExceptions.BindException.NotBindedException(currentType);
                 }
                 
-                bindInfo = container.BindInfoMap[currentType];
-                
-                if (!bindInfo.ContractsTypes.Contains(type))
-                    JsExceptions.BindException.ContractNotBindedToInstance(currentType, type);
-            }
-            
-            if (type.IsClass && !type.IsAbstract)
-                bindInfo = container.BindInfoMap[currentType];
-
-            if (container.ContainerInfo[currentType].Key && bindInfo!.LifeCycle == LifeCycle.Singleton)
-                return container.ContainerInfo[currentType].Value;
-
-            if (InstanceUtil.ParametersUtil.HasCircularDependency(type,
-                    InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
-                return null;
-
-            if (bindInfo!.LifeCycle == LifeCycle.Transient || bindInfo.LifeCycle == LifeCycle.Scoped)
-            {
-                var genericMethod = FindMethod(container, currentType);
-                var obj = genericMethod.Invoke(null,
-                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
-                return obj;
-            }
-            
-            if (bindInfo!.LifeCycle == LifeCycle.Singleton && !container.ContainerInfo[currentType].Key)
-            {
-                var genericMethod = FindMethod(container, currentType);
-                var obj = genericMethod.Invoke(null,
-                    new object[] { InstanceUtil.ConstructorUtils.GetConstructor(currentType), container });
-                return obj;
+                return true;
             }
 
-            return null;
+            return false;
         }
 
         private static MethodInfo FindMethod(DiContainer container, Type currentType)
@@ -72,73 +109,6 @@ namespace JSInjector
                     container.BindInfoMap[currentType].ParameterExpressions).ToArray());
             return genericMethod;
         }
-
-        internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
-            KeyValuePair<bool, object> keyValuePair)
-        {
-            if (!currentContainer.ContainerInfo.ContainsKey(type))
-            {
-                currentContainer.BindQueue.Enqueue(
-                    new KeyValuePair<Type, KeyValuePair<bool, object>>(type, keyValuePair));
-                currentContainer.ContainerInfo.Add(type, keyValuePair);
-                currentContainer.BindInfoMap.Add(type, bindInfo);
-            }
-        }
-
-        internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindTypes bindTypes,
-            KeyValuePair<bool, object> keyValuePair, LifeCycle lifeCycle)
-        {
-            currentContainer.BindQueue.Dequeue();
-            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default, currentContainer, lifeCycle);
-            ReWriteContainerInfo(currentContainer, type, keyValuePair);
-            ReWriteBindInfo(currentContainer, type, bindInfo);
-        }
-
-        internal static void ReWriteInstanceInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
-            KeyValuePair<bool, object> keyValuePair)
-        {
-            ReWriteContainerInfo(currentContainer, type, keyValuePair);
-            ReWriteBindInfo(currentContainer, type, bindInfo);
-        }
-
-        internal static void InitializeFactoryInfoMap(this DiContainer container, Type type,
-            FactoryBindInfo factoryBindInfo)
-        {
-            container.FactoryBindInfoMap.Add(type, factoryBindInfo);
-        }
-
-        internal static BindInfo GetBindInfo(this DiContainer container, Type type, BindTypes bindType,
-            InstanceType instanceType, LifeCycle lifeCycle)
-        {
-            if (container.BindInfoMap.ContainsKey(type))
-                return container.BindInfoMap[type];
-
-            return new BindInfo(type, bindType, instanceType, container, lifeCycle);
-        }
-
-        private static void ReWriteBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo)
-        {
-            if (!currentContainer.BindInfoMap.ContainsKey(type))
-            {
-                JsExceptions.BindException.NotBindedException(type);
-                return;
-            }
-
-            currentContainer.BindInfoMap.Remove(type);
-            currentContainer.BindInfoMap.Add(type, bindInfo);
-        }
-
-        private static void ReWriteContainerInfo(this DiContainer currentContainer, Type type,
-            KeyValuePair<bool, object> keyValuePair)
-        {
-            if (!currentContainer.ContainerInfo.ContainsKey(type))
-            {
-                JsExceptions.BindException.NotBindedException(type);
-                return;
-            }
-
-            currentContainer.ContainerInfo.Remove(type);
-            currentContainer.ContainerInfo.Add(type, keyValuePair);
-        }
+        
     }
 }

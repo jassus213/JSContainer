@@ -11,8 +11,8 @@ public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
         base.Install();
         Container.BindInterfacesAndSelfTo<Test>().AsSingleton();
         Container.BindInterfacesAndSelfTo<Test1>().AsSingleton();
-        Container.BindInterfacesAndSelfTo<Foo>().AsSingleton();
-        Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
+        Container.BindInterfacesAndSelfTo<Foo>().AsTransient();
+        Container.BindInterfacesAndSelfTo<Bar>().AsScoped();
         Container.Initialize();
     }
 }

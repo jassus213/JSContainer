@@ -20,6 +20,7 @@ namespace JSInjector
         internal readonly Dictionary<Type, IEnumerable<Type>> ContractsInfo = new Dictionary<Type, IEnumerable<Type>>();
 
         internal readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
+        internal readonly Dictionary<Type, Dictionary<Type, object>> ScopedInstance = new Dictionary<Type, Dictionary<Type, object>>();
 
         internal readonly Dictionary<Type, FactoryBindInfo>
             FactoryBindInfoMap = new Dictionary<Type, FactoryBindInfo>();

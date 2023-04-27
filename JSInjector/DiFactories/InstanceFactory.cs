@@ -21,7 +21,7 @@ namespace JSInjector.DiFactories
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TConcrete>(constructorInfo, parameters);
-            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1>(diContainer));
+            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer));
             diContainer.ReWriteInstanceInfo(obj.GetType(), diContainer.BindInfoMap[obj.GetType()],
                 new KeyValuePair<bool, object>(true, obj));
             return obj;
@@ -33,8 +33,8 @@ namespace JSInjector.DiFactories
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TConcrete>(constructorInfo, parameters);
-            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1>(diContainer),
-                (TArg2)DiContainerManager.SearchInstance<TArg2>(diContainer));
+            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer),
+                (TArg2)DiContainerManager.SearchInstance<TArg2, TConcrete>(diContainer));
             diContainer.ReWriteInstanceInfo(obj.GetType(), diContainer.BindInfoMap[obj.GetType()],
                 new KeyValuePair<bool, object>(true, obj));
             return obj;
@@ -46,9 +46,9 @@ namespace JSInjector.DiFactories
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TConcrete>(constructorInfo, parameters);
-            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1>(diContainer),
-                (TArg2)DiContainerManager.SearchInstance<TArg2>(diContainer),
-                (TArg3)DiContainerManager.SearchInstance<TArg3>(diContainer));
+            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer),
+                (TArg2)DiContainerManager.SearchInstance<TArg2, TConcrete>(diContainer),
+                (TArg3)DiContainerManager.SearchInstance<TArg3, TConcrete>(diContainer));
             diContainer.ReWriteInstanceInfo(obj.GetType(), diContainer.BindInfoMap[obj.GetType()],
                 new KeyValuePair<bool, object>(true, obj));
             return obj;
@@ -60,10 +60,10 @@ namespace JSInjector.DiFactories
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TArg4, TConcrete>(constructorInfo, parameters);
-            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1>(diContainer),
-                (TArg2)DiContainerManager.SearchInstance<TArg2>(diContainer),
-                (TArg3)DiContainerManager.SearchInstance<TArg3>(diContainer),
-                (TArg4)DiContainerManager.SearchInstance<TArg4>(diContainer));
+            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer),
+                (TArg2)DiContainerManager.SearchInstance<TArg2, TConcrete>(diContainer),
+                (TArg3)DiContainerManager.SearchInstance<TArg3, TConcrete>(diContainer),
+                (TArg4)DiContainerManager.SearchInstance<TArg4, TConcrete>(diContainer));
             diContainer.ReWriteInstanceInfo(obj.GetType(), diContainer.BindInfoMap[obj.GetType()],
                 new KeyValuePair<bool, object>(true, obj));
             return obj;
@@ -77,11 +77,11 @@ namespace JSInjector.DiFactories
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TArg4, TArg5, TConcrete>(constructorInfo,
                 parameters);
-            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1>(diContainer),
-                (TArg2)DiContainerManager.SearchInstance<TArg2>(diContainer),
-                (TArg3)DiContainerManager.SearchInstance<TArg3>(diContainer),
-                (TArg4)DiContainerManager.SearchInstance<TArg4>(diContainer),
-                (TArg5)DiContainerManager.SearchInstance<TArg5>(diContainer));
+            var obj = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer),
+                (TArg2)DiContainerManager.SearchInstance<TArg2, TConcrete>(diContainer),
+                (TArg3)DiContainerManager.SearchInstance<TArg3, TConcrete>(diContainer),
+                (TArg4)DiContainerManager.SearchInstance<TArg4, TConcrete>(diContainer),
+                (TArg5)DiContainerManager.SearchInstance<TArg5, TConcrete>(diContainer));
 
             return obj;
         }
