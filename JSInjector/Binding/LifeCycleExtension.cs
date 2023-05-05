@@ -1,6 +1,6 @@
 ﻿namespace JSInjector.Binding
 {
-    public static class Extension
+    public static class LifeCycleExtension
     {
         public static void AsSingleton<TContract>(this ConcreteIdBinder<TContract> concreteIdBinder)
         {

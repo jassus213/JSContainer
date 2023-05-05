@@ -5,7 +5,7 @@ namespace JSInjector.Utils
 {
     internal static class LifeCycleUtil
     {
-        internal static bool IsScopedInstanced(DiContainer container, Type currentType, Type instanceType)
+        internal static bool IsScopedInstanced(this DiContainer container, Type currentType, Type instanceType)
         {
             if (!container.ScopedInstance.ContainsKey(currentType))
                 return false;
@@ -17,7 +17,7 @@ namespace JSInjector.Utils
             return false;
         }
 
-        internal static bool IsSingletonInstanced(DiContainer container, Type currentType)
+        internal static bool IsSingletonInstanced(this DiContainer container, Type currentType)
         {
             if (!container.ContainerInfo.ContainsKey(currentType))
                 JsExceptions.BindException.NotBindedException(currentType);

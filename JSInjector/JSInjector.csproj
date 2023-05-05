@@ -34,12 +34,15 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
+      <Compile Include="Binding\BindInfoExstension.cs" />
       <Compile Include="Binding\BindInfo\BindInfo.cs" />
       <Compile Include="Binding\BindInfo\BindInfoManager.cs" />
       <Compile Include="Binding\BindInfo\BindTypes.cs" />
       <Compile Include="Binding\BindInfo\FactoryBindInfo.cs" />
+      <Compile Include="Binding\BindInfo\Factory\BindInfoFactory.cs" />
       <Compile Include="Binding\ConcreteIdBinder.cs" />
       <Compile Include="Binding\ConcreteIdLifeCycle.cs" />
+      <Compile Include="Binding\LifeCycleExtension.cs" />
       <Compile Include="Binding\FactoryConcreteIdBinder.cs" />
       <Compile Include="Contracts\IContainer.cs" />
       <Compile Include="Contracts\IInitializer.cs" />
@@ -55,6 +58,7 @@
       <Compile Include="Installers\MajorInstaller.cs" />
       <Compile Include="JSExceptions\JSExceptions.cs" />
       <Compile Include="JSExceptions\JSWarnings.cs" />
+      <Compile Include="Test.cs" />
       <Compile Include="Tests\Bar.cs" />
       <Compile Include="Tests\Foo.cs" />
       <Compile Include="Tests\IBar.cs" />
@@ -62,10 +66,13 @@
       <Compile Include="Tests\Test.cs" />
       <Compile Include="Tests\Test1.cs" />
       <Compile Include="Tests\TestFactory.cs" />
+      <Compile Include="Tests\WithArguments\WithArgumentClass.cs" />
+      <Compile Include="Tests\WithArguments\WrongArgumentsCountClass.cs" />
       <Compile Include="Utils\InstanceUtil.cs" />
       <Compile Include="Utils\LifeCycleUtil.cs" />
     </ItemGroup>
     <ItemGroup>
+      <Reference Include="Microsoft.CSharp" />
       <Reference Include="nunit.framework, Version=3.13.3.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
         <HintPath>..\packages\NUnit.3.13.3\lib\net45\nunit.framework.dll</HintPath>
       </Reference>

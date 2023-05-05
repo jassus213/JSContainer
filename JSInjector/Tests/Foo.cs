@@ -11,12 +11,6 @@ namespace JSInjector.Tests
         public Foo(DiContainer diContainer)
         {
             DiContainer = diContainer;
-            Guid = System.Guid.NewGuid().ToString();
-        }
-
-        public void Test()
-        {
-            Console.WriteLine("Test");
         }
 
         public string PrintGUID()

@@ -1,8 +1,8 @@
-﻿using JSInjector.Installers;
+﻿using JSInjector.Binding;
+using JSInjector.Installers;
 using JSInjector.Tests;
 
-
-namespace NUnitTests;
+namespace NUnitTests.Installers;
 
 public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
 {
@@ -10,9 +10,8 @@ public class BindInterfacesAndSelfToTestInstaller : MajorInstaller
     {
         base.Install();
         Container.BindInterfacesAndSelfTo<Test>().AsSingleton();
-        Container.BindInterfacesAndSelfTo<Test1>().AsSingleton();
-        Container.BindInterfacesAndSelfTo<Foo>().AsTransient();
-        Container.BindInterfacesAndSelfTo<Bar>().AsScoped();
+        Container.BindInterfacesAndSelfTo<Foo>().AsSingleton();
+        Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
         Container.Initialize();
     }
 }

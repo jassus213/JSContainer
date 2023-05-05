@@ -1,11 +1,11 @@
-﻿namespace JSInjector.Tests
+﻿namespace JSInjector.Tests.WithArguments
 {
     public class WithArgumentClass
     {
         public Foo Foo;
-        public IBar Bar;
+        public Bar Bar;
         
-        public WithArgumentClass(IBar bar, Foo foo)
+        public WithArgumentClass(Bar bar, Foo foo)
         {
             Bar = bar;
             Foo = foo;

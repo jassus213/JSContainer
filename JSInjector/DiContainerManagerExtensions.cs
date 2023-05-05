@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JSInjector.Binding.BindInfo;
+using JSInjector.Binding.BindInfo.Factory;
 using JSInjector.JSExceptions;
 
 namespace JSInjector
@@ -10,7 +11,7 @@ namespace JSInjector
         internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
             KeyValuePair<bool, object> keyValuePair)
         {
-            if (!currentContainer.ContainerInfo.ContainsKey(type))
+            if (!currentContainer.ContainerInfo.ContainsKey(type) && !type.IsInterface)
             {
                 currentContainer.BindQueue.Enqueue(
                     new KeyValuePair<Type, KeyValuePair<bool, object>>(type, keyValuePair));
@@ -23,7 +24,7 @@ namespace JSInjector
             KeyValuePair<bool, object> keyValuePair, LifeCycle lifeCycle)
         {
             currentContainer.BindQueue.Dequeue();
-            var bindInfo = new BindInfo(type, bindTypes, InstanceType.Default, currentContainer, lifeCycle);
+            var bindInfo = BindInfoFactory.Create(type, bindTypes, InstanceType.Default, currentContainer, lifeCycle);
             ReWriteContainerInfo(currentContainer, type, keyValuePair);
             ReWriteBindInfo(currentContainer, type, bindInfo);
         }
@@ -47,7 +48,7 @@ namespace JSInjector
             if (container.BindInfoMap.ContainsKey(type))
                 return container.BindInfoMap[type];
 
-            return new BindInfo(type, bindType, instanceType, container, lifeCycle);
+            return BindInfoFactory.Create(type, bindType, instanceType, container, lifeCycle);
         }
 
         private static void ReWriteBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo)

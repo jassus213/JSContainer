@@ -9,6 +9,23 @@ namespace JSInjector.Utils
 {
     internal static class InstanceUtil
     {
+        internal static bool IsInterfaceAndBinded(Type type, DiContainer container)
+        {
+            if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
+            {
+                var currentType = container.ContractsInfo[type].Last();
+
+                if (!container.BindInfoMap.ContainsKey(currentType))
+                {
+                    JsExceptions.BindException.NotBindedException(currentType);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         internal static class ParametersUtil
         {
             internal static bool HasCircularDependency(Type type, IEnumerable<ParameterExpression> parameterExpressions)
@@ -25,23 +42,24 @@ namespace JSInjector.Utils
                 }
 
                 return false;
-            }   
-            
+            }
+
             internal static IReadOnlyCollection<ParameterExpression> Map(Type[] requiredParameters)
             {
                 var result = new List<ParameterExpression>();
-            
+
                 for (int i = 0; i < requiredParameters.Length; i++)
                 {
                     var name = "Parameter " + i;
-                    var parameter = Expression.Parameter(requiredParameters[i],  name);
+                    var parameter = Expression.Parameter(requiredParameters[i], name);
                     result.Add(parameter);
                 }
 
                 return result;
             }
-            
-            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(Type type, Type[] contractTypes, CallingConventions callingConventions)
+
+            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(Type type, Type[] contractTypes,
+                CallingConventions callingConventions = default)
             {
                 var parameterInfos = type.GetConstructor(BindingFlags.Default, null,
                     callingConventions, contractTypes, null)?.GetParameters();
@@ -54,7 +72,7 @@ namespace JSInjector.Utils
                 return GetParametersInfo(ConstructorUtils.GetConstructor(constructorType));
             }
 
-            internal static IReadOnlyCollection<ParameterInfo> GetParametersInfo(ConstructorInfo constructorInfo)
+            private static IReadOnlyCollection<ParameterInfo> GetParametersInfo(ConstructorInfo constructorInfo)
             {
                 return constructorInfo.GetParameters();
             }
@@ -65,33 +83,30 @@ namespace JSInjector.Utils
                     .Select(x => x.ParameterType)).ToArray();
             }
 
-            internal static IReadOnlyCollection<ParameterExpression> GetParametersExpression(IEnumerable<Type> requiredParameters)
+            internal static IReadOnlyCollection<ParameterExpression> GetParametersExpression(
+                IEnumerable<Type> requiredParameters)
             {
                 var result = new List<ParameterExpression>();
                 var parametersArray = requiredParameters.ToArray();
-            
+
                 for (int i = 0; i < parametersArray.Length; i++)
                 {
                     var name = "Parameter " + i;
-                    var parameter = Expression.Parameter(parametersArray[i],  name);
+                    var parameter = Expression.Parameter(parametersArray[i], name);
                     result.Add(parameter);
                 }
 
                 return result;
             }
         }
-        
+
         internal static class GenericParameters
         {
-            internal static IReadOnlyCollection<Type> GenericArgumentsMap(Type type, IEnumerable<ParameterExpression> arguments)
+            internal static IReadOnlyCollection<Type> GenericArgumentsMap(Type type,
+                IEnumerable<ParameterExpression> arguments)
             {
-                var result = new List<Type>();
+                var result = arguments.Select(x => x.Type).ToList();
 
-                foreach (var argument in arguments)
-                {
-                    result.Add(argument.Type);
-                }
-            
                 result.Add(type);
                 return result.ToArray();
             }
@@ -115,12 +130,14 @@ namespace JSInjector.Utils
 
             internal static ConstructorInfo GetConstructor(Type type, int requiredParamsCount)
             {
-                var constructors = type.GetConstructors().Where(x => x.GetParameters().Length == requiredParamsCount).ToArray();
+                var constructors = type.GetConstructors().Where(x => x.GetParameters().Length == requiredParamsCount)
+                    .ToArray();
                 if (constructors.Length > 1)
-                    JsWarnings.ConstructorWarnings.LotConstructorReturnedWarning(constructors.Count(), constructors.ToArray());
+                    JsWarnings.ConstructorWarnings.LotConstructorReturnedWarning(constructors.Count(),
+                        constructors.ToArray());
                 if (constructors.Length == 0)
                     JsExceptions.ConstructorException.ConstructorIsNullException(type);
-                
+
                 return constructors.First();
             }
 
@@ -129,10 +146,9 @@ namespace JSInjector.Utils
                 var constructorInfo = type.GetConstructor(requiredParams.ToArray());
                 if (constructorInfo == null)
                     JsExceptions.ConstructorException.ConstructorIsNullException(type);
-                
+
                 return constructorInfo;
             }
         }
-
     }
 }

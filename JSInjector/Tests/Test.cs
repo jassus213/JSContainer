@@ -16,10 +16,5 @@ namespace JSInjector.Tests
             
             Debug.WriteLine($"{GetType().Name} : Bar Guid is {Bar.PrintGUID()}, Foo Guid is {Foo.PrintGUID()}");
         }
-        
-        public Test()
-        {
-            
-        }
     }
 }

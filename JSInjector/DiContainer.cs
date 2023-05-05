@@ -89,28 +89,30 @@ namespace JSInjector
             return Bind<TContract>(bindInfo);
         }
 
-        public void BindInterfacesTo<TContract>()
+        public ConcreteIdBinder<TContract> BindInterfacesTo<TContract>()
         {
             var type = typeof(TContract);
             var bindInfo = this.GetBindInfo(type, BindTypes.InterfacesTo, InstanceType.Default, LifeCycle.Default);
             Bind<TContract>(bindInfo);
+            return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
 
-        public void BindSelfTo<TContract>()
+        public ConcreteIdBinder<TContract> BindSelfTo<TContract>()
         {
             var type = typeof(TContract);
             var bindInfo = this.GetBindInfo(type, BindTypes.SelfTo, InstanceType.Default, LifeCycle.Default);
             this.InitializeBindInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
             Bind<TContract>();
+            return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
 
-        public ConcreteIdLifeCycle<TContract> BindInterfacesAndSelfTo<TContract>()
+        public ConcreteIdBinder<TContract> BindInterfacesAndSelfTo<TContract>()
         {
             var type = typeof(TContract);
             var bindInfo = this.GetBindInfo(type, BindTypes.InterfacesAndSelfTo, InstanceType.Default,
                 LifeCycle.Default);
             this.InitializeBindInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
-            return new ConcreteIdLifeCycle<TContract>(this);
+            return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
 
         public FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>() where TFactory : IFactory

@@ -3,45 +3,38 @@ using JSInjector.Utils;
 
 namespace JSInjector.Binding.BindInfo
 {
-    public class BindInfoManager
+    internal static class BindInfoManager
     {
-        private readonly BindInfo _bindInfo;
-
-        public BindInfoManager(BindInfo bindInfo)
+        private static void BindSelf(this BindInfo bindInfo, DiContainer container)
         {
-            _bindInfo = bindInfo;
-        }
-
-        private void BindSelf(DiContainer container)
-        {
-            var type = _bindInfo.CurrentType;
+            var type = bindInfo.CurrentType;
             var constructor = InstanceUtil.ConstructorUtils.GetConstructor(type);
             var parameters =
                 InstanceUtil.ParametersUtil.GetParametersExpression(constructor.GetParameters()
                     .Select(x => x.ParameterType));
-            _bindInfo.SetParameterExpressions(parameters);
+            bindInfo.SetParameterExpressions(parameters);
         }
 
-        internal void BindSelfTo(DiContainer container)
+        internal static void BindSelfTo(this BindInfo bindInfo, DiContainer container)
         {
-            BindSelf(container);
+            BindSelf(bindInfo, container);
         }
 
-        internal void BindInterfacesTo(DiContainer container)
+        internal static void BindInterfacesTo(this BindInfo bindInfo, DiContainer container)
         {
-            var contracts = InstanceUtil.ContractsUtil.GetContractsExpression(_bindInfo.CurrentType);
+            var contracts = InstanceUtil.ContractsUtil.GetContractsExpression(bindInfo.CurrentType);
             foreach (var contract in contracts)
             {
-                container.ContractsInfo.Add(contract, new[] { _bindInfo.CurrentType });
+                container.ContractsInfo.Add(contract, new[] { bindInfo.CurrentType });
             }
 
-            _bindInfo.SetContracts(contracts);
+            bindInfo.AddContracts(contracts);
         }
 
-        internal void BindInterfacesAndSelfTo(DiContainer container)
+        internal static void BindInterfacesAndSelfTo(this BindInfo bindInfo, DiContainer container)
         {
-            BindSelf(container);
-            BindInterfacesTo(container);
+            BindSelf(bindInfo, container);
+            BindInterfacesTo(bindInfo, container);
         }
     }
 }

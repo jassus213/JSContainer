@@ -17,7 +17,7 @@ namespace JSInjector.DiFactories
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TConcrete>(ConstructorInfo constructorInfo,
-            DiContainer diContainer)
+            DiContainer diContainer) where TConcrete : class where TArg1 : class
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TConcrete>(constructorInfo, parameters);
@@ -29,7 +29,7 @@ namespace JSInjector.DiFactories
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TConcrete>(ConstructorInfo constructorInfo,
-            DiContainer diContainer)
+            DiContainer diContainer) where TConcrete : class where TArg1 : class where TArg2 : class
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TConcrete>(constructorInfo, parameters);
@@ -42,7 +42,7 @@ namespace JSInjector.DiFactories
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TConcrete>(ConstructorInfo constructorInfo,
-            DiContainer diContainer)
+            DiContainer diContainer) where TConcrete : class where TArg1 : class where TArg2 : class where TArg3 : class
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TConcrete>(constructorInfo, parameters);
@@ -56,7 +56,7 @@ namespace JSInjector.DiFactories
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TArg4, TConcrete>(ConstructorInfo constructorInfo,
-            DiContainer diContainer)
+            DiContainer diContainer) where TConcrete : class where TArg2 : class where TArg1 : class where TArg3 : class where TArg4 : class
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TArg4, TConcrete>(constructorInfo, parameters);
@@ -72,7 +72,7 @@ namespace JSInjector.DiFactories
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TConcrete>(
             ConstructorInfo constructorInfo,
-            DiContainer diContainer)
+            DiContainer diContainer) where TConcrete : class where TArg1 : class where TArg2 : class where TArg3 : class where TArg4 : class where TArg5 : class
         {
             var parameters = InstanceUtil.ParametersUtil.GetParametersExpression(typeof(TConcrete));
             var func = FuncFactory.CreateFunc<TArg1, TArg2, TArg3, TArg4, TArg5, TConcrete>(constructorInfo,

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding.BindInfo;
 using JSInjector.DiFactories;
@@ -11,37 +13,47 @@ namespace JSInjector
 {
     internal static class DiContainerManager
     {
-        internal static object SearchInstance<TInstance, TConcrete>(DiContainer container)
+        internal static object SearchInstance<TInstance, TConcrete>(DiContainer container) where TConcrete : class where TInstance : class
         {
             var type = typeof(TInstance);
             var currentType = type;
             BindInfo bindInfo = null;
 
-            if (IsInterface(currentType, container))
+
+            if (InstanceUtil.IsInterfaceAndBinded(currentType, container))
             {
                 currentType = container.ContractsInfo[type].Last();
 
                 bindInfo = container.BindInfoMap[currentType];
-                
+
                 if (!bindInfo.ContractsTypes.Contains(type))
                     JsExceptions.BindException.ContractNotBindedToInstance(type, currentType);
             }
-            else
+            else if (container.BindInfoMap.ContainsKey(currentType))
             {
                 bindInfo = container.BindInfoMap[currentType];
             }
-
+            
+            
+            if (container.BindInfoMap[typeof(TConcrete)].ArgumentsMap.ContainsKey(currentType)) // Get argument from TConcrete
+            {
+                bindInfo = container.BindInfoMap[typeof(TConcrete)];
+                var instance = bindInfo.ArgumentsMap[currentType];
+                return instance;
+            }
+            
             if (InstanceUtil.ParametersUtil.HasCircularDependency(type,
                     InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
                 return null;
 
             if (bindInfo!.LifeCycle == LifeCycle.Singleton &&
-                LifeCycleUtil.IsSingletonInstanced(container, currentType))
+                container.IsSingletonInstanced(currentType))
             {
                 return container.ContainerInfo[currentType].Value;
             }
 
-            if (bindInfo!.LifeCycle == LifeCycle.Singleton && !LifeCycleUtil.IsSingletonInstanced(container, currentType))
+            if (bindInfo!.LifeCycle == LifeCycle.Singleton &&
+                !container.IsSingletonInstanced(currentType))
             {
                 var genericMethod = FindMethod(container, currentType);
                 var obj = genericMethod.Invoke(null,
@@ -51,14 +63,14 @@ namespace JSInjector
 
 
             if (bindInfo!.LifeCycle == LifeCycle.Scoped &&
-                LifeCycleUtil.IsScopedInstanced(container, currentType, typeof(TConcrete)))
+                container.IsScopedInstanced(currentType, typeof(TConcrete)))
             {
                 var instance = container.ScopedInstance[currentType][typeof(TConcrete)];
                 return instance;
             }
 
             if (bindInfo!.LifeCycle == LifeCycle.Scoped &&
-                !LifeCycleUtil.IsScopedInstanced(container, currentType, typeof(TConcrete)))
+                !container.IsScopedInstanced(currentType, typeof(TConcrete)))
             {
                 var genericMethod = FindMethod(container, currentType);
                 var obj = genericMethod.Invoke(null,
@@ -79,25 +91,6 @@ namespace JSInjector
             return null;
         }
 
-        private static bool IsInterface(Type type, DiContainer container)
-        {
-            var currentType = type;
-
-            if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
-            {
-                currentType = container.ContractsInfo[type].Last();
-
-                if (!container.BindInfoMap.ContainsKey(currentType))
-                {
-                    JsExceptions.BindException.NotBindedException(currentType);
-                }
-                
-                return true;
-            }
-
-            return false;
-        }
-
         private static MethodInfo FindMethod(DiContainer container, Type currentType)
         {
             var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
@@ -109,6 +102,5 @@ namespace JSInjector
                     container.BindInfoMap[currentType].ParameterExpressions).ToArray());
             return genericMethod;
         }
-        
     }
 }

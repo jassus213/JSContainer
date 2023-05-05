@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using JSInjector.Tests;
 using NUnit.Framework;
+using NUnitTests.Installers;
+using NUnitTests.Installers.BindWithArguments;
 
 namespace NUnitTests
 {
@@ -36,6 +38,27 @@ namespace NUnitTests
             installer.Install();
             var factory = installer.Container.Resolve<TestFactory>();
             var result = factory.Create();
+        }
+
+        [Test]
+        public void BindToTest()
+        {
+            var installer = new BindTo();
+            installer.Install();
+        }
+
+        [Test]
+        public void BindWithArguments()
+        {
+            var installer = new BindWithArguments();
+            installer.Install();
+        }
+
+        [Test]
+        public void BindWithArgumentsException()
+        {
+            var installer = new BindWithArgumentsExceptionInstaller();
+            installer.Install(); 
         }
     }
 }
