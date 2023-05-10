@@ -13,6 +13,8 @@ namespace JSInjector.Contracts
         ConcreteIdBinder<TContract> BindInterfacesAndSelfTo<TContract>();
         FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>() where TFactory : IFactory;
         FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TArgs, TResult>() where TFactory : IFactory where TArgs : struct;
+        void Initialize();
+        object InitializeWithOutOrder<TConcrete>();
 
     }
 }

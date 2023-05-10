@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace JSInjector.DiFactories
 {
-    internal static class FuncFactory
+    internal static class FunctionFactory
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static Func<TConcrete> CreateFunc<TConcrete>(ConstructorInfo constructorInfo)

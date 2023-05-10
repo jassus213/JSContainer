@@ -1,6 +1,3 @@
-using System;
-using System.Diagnostics;
-
 namespace JSInjector.Tests
 {
     public class Foo : IFoo

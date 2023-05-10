@@ -1,14 +1,17 @@
-﻿using JSInjector.Installers;
+﻿using System;
+using JSInjector.Installers;
+using JSInjector.Installers.MajorInstaller;
 using JSInjector.Tests;
 
-namespace NUnitTests;
-
-public class BindFactoryTest : MajorInstaller
+namespace NUnitTests.Installers
 {
-    public override void Install()
+    public class BindFactoryTest : MajorInstaller
     {
-        base.Install();
-        Container.BindFactory<TestFactory, Test>();
-        Container.Initialize();
+        public override void Install()
+        {
+            base.Install();
+            Container.BindFactory<TestFactory, Test>();
+            Container.Initialize();
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JSInjector.Binding.BindInfo;
+using JSInjector.Common.Enums;
 
 namespace JSInjector.Binding
 {

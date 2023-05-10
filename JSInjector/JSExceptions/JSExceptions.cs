@@ -3,63 +3,68 @@ using NUnit.Framework;
 
 namespace JSInjector.JSExceptions
 {
+    public static class JsException
+    {
+        public static readonly Func<string, Exception> Exception = (message) => new Exception(message);
+    }
+
     public static class JsExceptions
     {
         public static class BindException
         {
-            public static void NotBindedException(Type type)
+            public static Exception NotBindedException(Type type)
             {
-                var message = $"{nameof(type)} Is not binded";
-                Assert.Fail(message);
+                var message = $"{type} Is not binded";
+                return JsException.Exception(message);
             }
 
-            public static void AlreadyBindedException(Type type)
+            public static Exception AlreadyBindedException(Type type)
             {
-                var message = $"{nameof(type)} Already Binded";
-                Assert.Fail(message);
+                var message = $"{type} Already Binded";
+                return JsException.Exception(message);
             }
 
-            public static void CircularDependency(Type instanceType,
+            public static Exception CircularDependency(Type instanceType,
                 Type parameterType)
             {
-                var message = $"Circular Dependency {nameof(instanceType)} and {nameof(parameterType)}";
-                Assert.Fail(message);
+                var message = $"Circular Dependency {instanceType} and {parameterType}";
+                return JsException.Exception(message);
             }
 
-            public static void ContractNotBindedToInstance(Type instanceType, Type contractType)
+            public static Exception ContractNotBindedToInstance(Type instanceType, Type contractType)
             {
-                var message = $"{nameof(instanceType)} has not contract : {nameof(contractType)}";
-                Assert.Fail(message);
+                var message = $"{instanceType} has not contract : {contractType}";
+                return JsException.Exception(message);
             }
 
-            public static void BindingInterfaceException(Type instanceType, Type contractType)
+            public static Exception BindingInterfaceException(Type instanceType, Type contractType)
             {
                 var message = $"Cant find {contractType} while building {instanceType}";
-                Assert.Fail(message);
+                return JsException.Exception(message);
             }
         }
 
         public static class ResolveException
         {
-            public static void DoesntExistException(Type type)
+            public static Exception DoesntExistException(Type type)
             {
                 var message = $"{type} Doesnt exist";
-                Assert.Fail(message);
+                return JsException.Exception(message);
             }
         }
 
         public static class ConstructorException
         {
-            public static void ConstructorIsNullException(Type type)
+            public static Exception ConstructorIsNullException(Type type)
             {
                 var message = $"{type} Constructor is null";
-                Assert.Fail(message);
+                return JsException.Exception(message);
             }
 
-            public static void IsWrongParamsCountException(Type type, int requiredParametersCount)
+            public static Exception IsWrongParamsCountException(Type type, int requiredParametersCount)
             {
                 var message = $"{type} Constructor params not equals required parameters - {requiredParametersCount}";
-                Assert.Fail(message);
+                return JsException.Exception(message);
             }
         }
     }

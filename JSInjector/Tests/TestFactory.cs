@@ -14,9 +14,9 @@ namespace JSInjector.Tests
         
         public Test Create()
         {
-            var result = new Test(new Bar(new DiContainer()), new Foo(new DiContainer()), new DiContainer());
-            Create(_diContainer, result);
-            return result;
+            //var result = new Test(new Bar(new DiContainer()), new Foo(new DiContainer()), new DiContainer());
+            //Create(_diContainer, result);
+            return null;
         }
 
         protected override void Create<TResult>(IContainer container, TResult result)

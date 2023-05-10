@@ -34,31 +34,38 @@
         <WarningLevel>4</WarningLevel>
     </PropertyGroup>
     <ItemGroup>
-      <Compile Include="Binding\BindInfoExstension.cs" />
-      <Compile Include="Binding\BindInfo\BindInfo.cs" />
+      <Compile Include="Binding\BindInfo\BindInformation.cs" />
+      <Compile Include="Binding\BindInfo\BindInfoExstension.cs" />
       <Compile Include="Binding\BindInfo\BindInfoManager.cs" />
-      <Compile Include="Binding\BindInfo\BindTypes.cs" />
       <Compile Include="Binding\BindInfo\FactoryBindInfo.cs" />
       <Compile Include="Binding\BindInfo\Factory\BindInfoFactory.cs" />
       <Compile Include="Binding\ConcreteIdBinder.cs" />
       <Compile Include="Binding\ConcreteIdLifeCycle.cs" />
       <Compile Include="Binding\LifeCycleExtension.cs" />
       <Compile Include="Binding\FactoryConcreteIdBinder.cs" />
+      <Compile Include="Common\Enums\BindType.cs" />
+      <Compile Include="Common\Enums\InstanceType.cs" />
+      <Compile Include="Common\Enums\LifeCycle.cs" />
+      <Compile Include="Common\TypeInstancePair\TypeInstancePair.cs" />
+      <Compile Include="Common\TypeInstancePair\TypeInstancePairFactory.cs" />
       <Compile Include="Contracts\IContainer.cs" />
       <Compile Include="Contracts\IInitializer.cs" />
       <Compile Include="DiContainer.cs" />
       <Compile Include="DiContainerManager.cs" />
       <Compile Include="DiContainerManagerExtensions.cs" />
-      <Compile Include="DiFactories\FuncFactory.cs" />
+      <Compile Include="DiFactories\FunctionFactory.cs" />
       <Compile Include="DiFactories\InstanceFactory.cs" />
       <Compile Include="Factories\Factory.cs" />
       <Compile Include="Factories\IFactory.cs" />
       <Compile Include="FactoryInitializer.cs" />
-      <Compile Include="Installers\IInstaller.cs" />
-      <Compile Include="Installers\MajorInstaller.cs" />
+      <Compile Include="Installers\AddizionaleInstaller\AddizionaleInstaller.cs" />
+      <Compile Include="Installers\AddizionaleInstaller\IAddizionaleInstaller.cs" />
+      <Compile Include="Installers\Installer.cs" />
+      <Compile Include="Installers\MajorInstaller\IMajorInstaller.cs" />
+      <Compile Include="Installers\MajorInstaller\MajorInstaller.cs" />
       <Compile Include="JSExceptions\JSExceptions.cs" />
       <Compile Include="JSExceptions\JSWarnings.cs" />
-      <Compile Include="Test.cs" />
+      <Compile Include="Service\InstanceFactoryService.cs" />
       <Compile Include="Tests\Bar.cs" />
       <Compile Include="Tests\Foo.cs" />
       <Compile Include="Tests\IBar.cs" />
@@ -66,10 +73,12 @@
       <Compile Include="Tests\Test.cs" />
       <Compile Include="Tests\Test1.cs" />
       <Compile Include="Tests\TestFactory.cs" />
+      <Compile Include="Tests\TestScope.cs" />
       <Compile Include="Tests\WithArguments\WithArgumentClass.cs" />
       <Compile Include="Tests\WithArguments\WrongArgumentsCountClass.cs" />
-      <Compile Include="Utils\InstanceUtil.cs" />
-      <Compile Include="Utils\LifeCycleUtil.cs" />
+      <Compile Include="Utils\Instance\ConstructorConventionsSequence.cs" />
+      <Compile Include="Utils\Instance\InstanceUtil.cs" />
+      <Compile Include="Utils\LifeCycle\LifeCycleUtil.cs" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="Microsoft.CSharp" />

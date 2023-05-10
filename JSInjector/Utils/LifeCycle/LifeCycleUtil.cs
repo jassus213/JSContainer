@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using JSInjector.JSExceptions;
 
 namespace JSInjector.Utils
 {
     internal static class LifeCycleUtil
     {
-        internal static bool IsScopedInstanced(this DiContainer container, Type currentType, Type instanceType)
+        internal static bool IsScopedInstanced(ref Dictionary<Type, Dictionary<Type, object>> scopedInstances, Type currentType, Type instanceType)
         {
-            if (!container.ScopedInstance.ContainsKey(currentType))
+            if (!scopedInstances.ContainsKey(currentType))
                 return false;
 
-            if (container.ScopedInstance[currentType].ContainsKey(instanceType) &&
-                container.ScopedInstance[currentType][instanceType] != null)
+            if (scopedInstances[currentType].ContainsKey(instanceType) &&
+                scopedInstances[currentType][instanceType] != null)
                 return true;
 
             return false;
@@ -20,7 +21,7 @@ namespace JSInjector.Utils
         internal static bool IsSingletonInstanced(this DiContainer container, Type currentType)
         {
             if (!container.ContainerInfo.ContainsKey(currentType))
-                JsExceptions.BindException.NotBindedException(currentType);
+                throw JsExceptions.BindException.NotBindedException(currentType);
 
             return container.ContainerInfo[currentType].Key;
         }

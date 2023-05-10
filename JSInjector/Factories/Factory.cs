@@ -1,4 +1,5 @@
 ﻿using JSInjector.Binding.BindInfo;
+using JSInjector.Common.Enums;
 using IContainer = JSInjector.Contracts.IContainer;
 
 namespace JSInjector.Factories
@@ -7,7 +8,7 @@ namespace JSInjector.Factories
     {
         protected virtual void Create<TResult>(IContainer container, TResult result)
         {
-            container.Bind<TResult>().FromResolve(result, BindTypes.Default);
+            container.Bind<TResult>().FromResolve(result, BindType.Default);
         }
     }
 }

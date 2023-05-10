@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using JSInjector.Binding.BindInfo;
-using LifeCycle = JSInjector.Binding.BindInfo.LifeCycle;
+using JSInjector.Common.Enums;
+using JSInjector.Common.TypeInstancePair;
+using LifeCycle = JSInjector.Common.Enums.LifeCycle;
 
 namespace JSInjector.Binding
 {
     public class ConcreteIdBinder<TContract>
     {
         internal readonly DiContainer DiContainer;
-        private readonly BindInfo.BindInfo _bindInfo;
+        private readonly BindInformation _bindInformation;
 
-        public ConcreteIdBinder(DiContainer diContainer, BindInfo.BindInfo bindInfo)
+        public ConcreteIdBinder(DiContainer diContainer, BindInformation bindInformation)
         {
             DiContainer = diContainer;
-            _bindInfo = bindInfo;
+            _bindInformation = bindInformation;
         }
 
         public void To<TConcrete>()
@@ -53,10 +55,10 @@ namespace JSInjector.Binding
             return new ConcreteIdLifeCycle<TContract>(DiContainer);
         }
 
-        public ConcreteIdLifeCycle<TContract> FromResolve(object obj, BindTypes bindType = BindTypes.Default)
+        public ConcreteIdLifeCycle<TContract> FromResolve(object instance, BindType bindType = BindType.Default)
         {
-            var type = obj.GetType();
-            DiContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, object>(true, obj),
+            var type = instance.GetType();
+            DiContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance)),
                 LifeCycle.Default);
             return new ConcreteIdLifeCycle<TContract>(DiContainer);
         }

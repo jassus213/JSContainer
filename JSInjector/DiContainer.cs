@@ -1,68 +1,61 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using JSInjector.Binding;
 using JSInjector.Binding.BindInfo;
+using JSInjector.Common.Enums;
+using JSInjector.Common.TypeInstancePair;
 using JSInjector.Contracts;
-using JSInjector.DiFactories;
 using JSInjector.Factories;
 using JSInjector.JSExceptions;
-using JSInjector.Utils;
+using JSInjector.Service;
 
 namespace JSInjector
 {
     public class DiContainer : IContainer
     {
-        internal readonly Dictionary<Type, KeyValuePair<bool, object>> ContainerInfo =
-            new Dictionary<Type, KeyValuePair<bool, object>>();
+        internal Dictionary<Type, KeyValuePair<bool, TypeInstancePair>> ContainerInfo =
+            new Dictionary<Type, KeyValuePair<bool, TypeInstancePair>>();
 
-        internal readonly Dictionary<Type, IEnumerable<Type>> ContractsInfo = new Dictionary<Type, IEnumerable<Type>>();
+        internal Dictionary<Type, IEnumerable<Type>> ContractsInfo = new Dictionary<Type, IEnumerable<Type>>();
 
-        internal readonly Dictionary<Type, BindInfo> BindInfoMap = new Dictionary<Type, BindInfo>();
-        internal readonly Dictionary<Type, Dictionary<Type, object>> ScopedInstance = new Dictionary<Type, Dictionary<Type, object>>();
+        internal Dictionary<Type, BindInformation> BindInfoMap = new Dictionary<Type, BindInformation>();
+
+        internal Dictionary<Type, Dictionary<Type, object>> ScopedInstance =
+            new Dictionary<Type, Dictionary<Type, object>>();
 
         internal readonly Dictionary<Type, FactoryBindInfo>
             FactoryBindInfoMap = new Dictionary<Type, FactoryBindInfo>();
 
-        internal readonly Queue<KeyValuePair<Type, KeyValuePair<bool, object>>> BindQueue =
-            new Queue<KeyValuePair<Type, KeyValuePair<bool, object>>>();
+        internal readonly Queue<KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>> BindQueue =
+            new Queue<KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>>();
+
+        private readonly IReadOnlyDictionary<InstanceType, Func<Type, BindInformation, object>> _instanceFactoryMap;
+
+        public DiContainer()
+        {
+            _instanceFactoryMap = new Dictionary<InstanceType, Func<Type, BindInformation, object>>()
+            {
+                [InstanceType.Default] = (type, bindInfo) =>
+                    InstanceFactoryService.FindAndInvokeMethod(this, type, bindInfo),
+                [InstanceType.Factory] = (type, bindInfo) =>
+                    InstanceFactoryService.FindAndInvokeMethod(this, type, bindInfo),
+            };
+        }
 
 
         public void Initialize()
         {
-            foreach (var keyValuePair in BindQueue.Where(keyValuePair => !keyValuePair.Value.Key))
+            foreach (var keyValuePair in BindQueue)
             {
-                switch (BindInfoMap[keyValuePair.Key].InstanceType)
-                {
-                    case InstanceType.Default:
-                        var baseMethods =
-                            typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-                        var currentMethod = baseMethods.First(x =>
-                            x.GetGenericArguments().Length - 1 ==
-                            BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
-                        var genericMethod = currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters
-                            .GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions)
-                            .ToArray());
-                        var obj = genericMethod.Invoke(this,
-                            new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
-                        break;
-                    case InstanceType.Factory:
-                        /*var baseMethodsFactory = typeof(InstanceFactory).GetMethods().First(x => x.Name == "Create" && x.GetGenericArguments().Length - 1 ==
-                            FactoryBindInfoMap[keyValuePair.Key].GenericArguments);*/
-                        var baseMethodsFactory =
-                            typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
-                        var baseMethod = baseMethodsFactory.First(x =>
-                            x.GetGenericArguments().Length - 1 ==
-                            BindInfoMap[keyValuePair.Key].ParameterExpressions.Count && x.Name == "CreateInstance");
-                        var genericMethodFactory = baseMethod.MakeGenericMethod(InstanceUtil.GenericParameters
-                            .GenericArgumentsMap(keyValuePair.Key, BindInfoMap[keyValuePair.Key].ParameterExpressions)
-                            .ToArray());
-                        var objFactory = genericMethodFactory.Invoke(this,
-                            new object[] { InstanceUtil.ConstructorUtils.GetConstructor(keyValuePair.Key), this });
-                        break;
-                }
+                if (ContainerInfo[keyValuePair.Key].Key)
+                    return;
+                
+                var method = _instanceFactoryMap[BindInfoMap[keyValuePair.Key].InstanceType];
+                var instance = method.Invoke(keyValuePair.Key, BindInfoMap[keyValuePair.Key]);
             }
+
+            BindQueue.Clear();
         }
 
         public TContract Resolve<TContract>()
@@ -70,29 +63,29 @@ namespace JSInjector
             var type = typeof(TContract);
             var containerInfo = ContainerInfo[type];
             if (containerInfo.Key)
-                return (TContract)containerInfo.Value;
+                return (TContract)containerInfo.Value.Instance;
 
-            JsExceptions.ResolveException.DoesntExistException(type);
-            return (TContract)containerInfo.Value;
+            throw JsExceptions.ResolveException.DoesntExistException(type);
         }
 
-        private ConcreteIdBinder<TContract> Bind<TContract>(BindInfo bindInfo)
+        private ConcreteIdBinder<TContract> Bind<TContract>(BindInformation bindInformation)
         {
-            this.InitializeBindInfo(typeof(TContract), bindInfo, new KeyValuePair<bool, object>(false, null));
-            return new ConcreteIdBinder<TContract>(this, bindInfo);
+            if (!typeof(TContract).IsInterface)
+                this.InitializeBindInfo(typeof(TContract), bindInformation, new KeyValuePair<bool, TypeInstancePair>(false, TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
+            return new ConcreteIdBinder<TContract>(this, bindInformation);
         }
 
         public ConcreteIdBinder<TContract> Bind<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = this.GetBindInfo(type, BindTypes.Default, InstanceType.Default, LifeCycle.Default);
+            var bindInfo = this.GetBindInfo(type, BindType.Default, InstanceType.Default, LifeCycle.Default);
             return Bind<TContract>(bindInfo);
         }
 
         public ConcreteIdBinder<TContract> BindInterfacesTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = this.GetBindInfo(type, BindTypes.InterfacesTo, InstanceType.Default, LifeCycle.Default);
+            var bindInfo = this.GetBindInfo(type, BindType.InterfacesTo, InstanceType.Default, LifeCycle.Default);
             Bind<TContract>(bindInfo);
             return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
@@ -100,18 +93,17 @@ namespace JSInjector
         public ConcreteIdBinder<TContract> BindSelfTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = this.GetBindInfo(type, BindTypes.SelfTo, InstanceType.Default, LifeCycle.Default);
-            this.InitializeBindInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
-            Bind<TContract>();
+            var bindInfo = this.GetBindInfo(type, BindType.SelfTo, InstanceType.Default, LifeCycle.Default);
+            Bind<TContract>(bindInfo);
             return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
 
         public ConcreteIdBinder<TContract> BindInterfacesAndSelfTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = this.GetBindInfo(type, BindTypes.InterfacesAndSelfTo, InstanceType.Default,
+            var bindInfo = this.GetBindInfo(type, BindType.InterfacesAndSelfTo, InstanceType.Default,
                 LifeCycle.Default);
-            this.InitializeBindInfo(type, bindInfo, new KeyValuePair<bool, object>(false, null));
+            Bind<TContract>(bindInfo);
             return new ConcreteIdBinder<TContract>(this, bindInfo);
         }
 
@@ -119,10 +111,10 @@ namespace JSInjector
         {
             var factoryType = typeof(TFactory);
             var resultType = typeof(TResult);
-            var bindInfo = this.GetBindInfo(factoryType, BindTypes.InterfacesAndSelfTo, InstanceType.Factory,
+            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, InstanceType.Factory,
                 LifeCycle.Default);
             var factoryBindInfo = new FactoryBindInfo(factoryType, resultType, false, 2);
-            this.InitializeBindInfo(factoryType, bindInfo, new KeyValuePair<bool, object>(false, null));
+            this.InitializeBindInfo(factoryType, bindInfo, new KeyValuePair<bool, TypeInstancePair>(false, TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
             return BindFactory<TFactory>(factoryBindInfo);
         }
 
@@ -131,10 +123,10 @@ namespace JSInjector
         {
             var factoryType = typeof(TFactory);
             var resultType = typeof(TResult);
-            var bindInfo = this.GetBindInfo(factoryType, BindTypes.InterfacesAndSelfTo, InstanceType.Factory,
+            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, InstanceType.Factory,
                 LifeCycle.Default);
             var factoryBindInfo = new FactoryBindInfo(factoryType, resultType, true, 3, typeof(TArgs));
-            this.InitializeBindInfo(factoryType, bindInfo, new KeyValuePair<bool, object>(false, null));
+            this.InitializeBindInfo(factoryType, bindInfo, new KeyValuePair<bool, TypeInstancePair>(false, TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
             return BindFactory<TFactory>(factoryBindInfo);
         }
 
@@ -142,6 +134,15 @@ namespace JSInjector
         {
             this.InitializeFactoryInfoMap(factoryBindInfo.FactoryType, factoryBindInfo);
             return new FactoryConcreteBinderId<TFactory>(this, factoryBindInfo);
+        }
+
+        public object InitializeWithOutOrder<TConcrete>()
+        {
+            var instance = InstanceFactoryService.FindAndInvokeMethod(this, typeof(TConcrete),
+                BindInfoMap[typeof(TConcrete)]);
+            var pair = new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance));
+            this.ReWriteInstanceInfo(typeof(TConcrete), BindInfoMap[typeof(TConcrete)], pair);
+            return instance;
         }
     }
 }

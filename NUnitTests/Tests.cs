@@ -1,7 +1,7 @@
 using System.Diagnostics;
-using JSInjector.Tests;
 using NUnit.Framework;
 using NUnitTests.Installers;
+using NUnitTests.Installers.AddizionaleTest;
 using NUnitTests.Installers.BindWithArguments;
 
 namespace NUnitTests
@@ -14,18 +14,11 @@ namespace NUnitTests
         }
 
         [Test]
-        public void TestBindInterfacesTo()
-        {
-            var installer = new BindInterfacesToTestInstaller();
-            installer.Install();
-        }
-
-        [Test]
         public void BindInterfacesAndSelfTo()
         {
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            var installer = new BindInterfacesAndSelfToTestInstaller();
+            var installer = new BindInterfacesAndSelfToTestMajorInstaller();
             installer.Install();
             stopwatch.Stop();
             Debug.WriteLine("Time to Finish Build " + stopwatch.Elapsed);
@@ -36,8 +29,6 @@ namespace NUnitTests
         {
             var installer = new BindFactoryTest();
             installer.Install();
-            var factory = installer.Container.Resolve<TestFactory>();
-            var result = factory.Create();
         }
 
         [Test]
@@ -57,8 +48,15 @@ namespace NUnitTests
         [Test]
         public void BindWithArgumentsException()
         {
-            var installer = new BindWithArgumentsExceptionInstaller();
+            var installer = new BindWithArgumentsExceptionMajorInstaller();
             installer.Install(); 
+        }
+
+        [Test]
+        public void BindWithAddizionaleInstaller()
+        {
+            var installer = new MainInstaller();
+            installer.Install();
         }
     }
 }

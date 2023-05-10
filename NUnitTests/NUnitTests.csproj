@@ -9,6 +9,8 @@
         <AssemblyName>NUnitTests</AssemblyName>
 
         <RootNamespace>NUnitTests</RootNamespace>
+
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

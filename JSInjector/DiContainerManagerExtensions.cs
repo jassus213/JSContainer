@@ -2,38 +2,43 @@
 using System.Collections.Generic;
 using JSInjector.Binding.BindInfo;
 using JSInjector.Binding.BindInfo.Factory;
+using JSInjector.Common.Enums;
+using JSInjector.Common.TypeInstancePair;
 using JSInjector.JSExceptions;
 
 namespace JSInjector
 {
     public static class DiContainerManagerExtensions
     {
-        internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
-            KeyValuePair<bool, object> keyValuePair)
+        internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInformation bindInformation,
+            KeyValuePair<bool, TypeInstancePair> keyValuePair)
         {
             if (!currentContainer.ContainerInfo.ContainsKey(type) && !type.IsInterface)
             {
                 currentContainer.BindQueue.Enqueue(
-                    new KeyValuePair<Type, KeyValuePair<bool, object>>(type, keyValuePair));
+                    new KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>(type, keyValuePair));
                 currentContainer.ContainerInfo.Add(type, keyValuePair);
-                currentContainer.BindInfoMap.Add(type, bindInfo);
+                currentContainer.BindInfoMap.Add(type, bindInformation);
+                return;
             }
+
+            throw JsExceptions.BindException.AlreadyBindedException(type);
         }
 
-        internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindTypes bindTypes,
-            KeyValuePair<bool, object> keyValuePair, LifeCycle lifeCycle)
+        internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindType bindType,
+            KeyValuePair<bool, TypeInstancePair> keyValuePair, LifeCycle lifeCycle)
         {
             currentContainer.BindQueue.Dequeue();
-            var bindInfo = BindInfoFactory.Create(type, bindTypes, InstanceType.Default, currentContainer, lifeCycle);
-            ReWriteContainerInfo(currentContainer, type, keyValuePair);
-            ReWriteBindInfo(currentContainer, type, bindInfo);
+            var bindInfo = BindInfoFactory.Create(type, bindType, InstanceType.Default, currentContainer, lifeCycle);
+            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, keyValuePair);
+            RewriteBindInfo(ref currentContainer.BindInfoMap, type, bindInfo);
         }
 
-        internal static void ReWriteInstanceInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo,
-            KeyValuePair<bool, object> keyValuePair)
+        internal static void ReWriteInstanceInfo(this DiContainer currentContainer, Type type, BindInformation bindInformation,
+            KeyValuePair<bool, TypeInstancePair> keyValuePair)
         {
-            ReWriteContainerInfo(currentContainer, type, keyValuePair);
-            ReWriteBindInfo(currentContainer, type, bindInfo);
+            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, keyValuePair);
+            RewriteBindInfo(ref currentContainer.BindInfoMap, type, bindInformation);
         }
 
         internal static void InitializeFactoryInfoMap(this DiContainer container, Type type,
@@ -42,7 +47,7 @@ namespace JSInjector
             container.FactoryBindInfoMap.Add(type, factoryBindInfo);
         }
 
-        internal static BindInfo GetBindInfo(this DiContainer container, Type type, BindTypes bindType,
+        internal static BindInformation GetBindInfo(this DiContainer container, Type type, BindType bindType,
             InstanceType instanceType, LifeCycle lifeCycle)
         {
             if (container.BindInfoMap.ContainsKey(type))
@@ -51,29 +56,28 @@ namespace JSInjector
             return BindInfoFactory.Create(type, bindType, instanceType, container, lifeCycle);
         }
 
-        private static void ReWriteBindInfo(this DiContainer currentContainer, Type type, BindInfo bindInfo)
+        private static void RewriteBindInfo(ref Dictionary<Type, BindInformation> bindInformationMap, Type type, BindInformation bindInformation)
         {
-            if (!currentContainer.BindInfoMap.ContainsKey(type))
+            if (!bindInformationMap.ContainsKey(type))
             {
-                JsExceptions.BindException.NotBindedException(type);
-                return;
+                throw JsExceptions.BindException.NotBindedException(type);
             }
-
-            currentContainer.BindInfoMap.Remove(type);
-            currentContainer.BindInfoMap.Add(type, bindInfo);
+            
+            bindInformationMap.Remove(type);
+            bindInformationMap.Add(type, bindInformation);
         }
 
-        private static void ReWriteContainerInfo(this DiContainer currentContainer, Type type,
-            KeyValuePair<bool, object> keyValuePair)
+        private static void RewriteContainerInfo(ref Dictionary<Type, KeyValuePair<bool, TypeInstancePair>> containerInfo, Type type,
+            KeyValuePair<bool, TypeInstancePair> keyValuePair)
         {
-            if (!currentContainer.ContainerInfo.ContainsKey(type))
+            if (!containerInfo.ContainsKey(type))
             {
-                JsExceptions.BindException.NotBindedException(type);
-                return;
+                throw JsExceptions.BindException.NotBindedException(type);
             }
 
-            currentContainer.ContainerInfo.Remove(type);
-            currentContainer.ContainerInfo.Add(type, keyValuePair);
+            var currentTypeInstancePair = containerInfo[type].Value;
+            containerInfo.Remove(type);
+            containerInfo.Add(type, keyValuePair);
         }
     }
 }

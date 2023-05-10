@@ -1,15 +1,17 @@
 ﻿using JSInjector.Installers;
+using JSInjector.Installers.MajorInstaller;
 using JSInjector.Tests;
 
-namespace NUnitTests.GitHub;
-
-public class GitHubIntroduce : MajorInstaller
+namespace NUnitTests.GitHub
 {
-    public override void Install()
+    public class GitHubIntroduce : MajorInstaller
     {
-        base.Install();
-        Container.BindInterfacesAndSelfTo<Bar>();
-        Container.BindInterfacesAndSelfTo<Foo>();
-        Container.Initialize();
+        public override void Install()
+        {
+            base.Install();
+            Container.BindInterfacesAndSelfTo<Bar>();
+            Container.BindInterfacesAndSelfTo<Foo>();
+            Container.Initialize();
+        }
     }
 }

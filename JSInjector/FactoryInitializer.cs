@@ -3,6 +3,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using JSInjector.Tests;
 using JSInjector.Utils;
+using JSInjector.Utils.Instance;
 
 namespace JSInjector
 {
@@ -42,7 +43,7 @@ namespace JSInjector
                 var type = typeof(TFactory);
                 var typeArg1 = typeof(TArgs);
 
-                var constructor = InstanceUtil.ConstructorUtils.GetConstructor(type);
+                var constructor = InstanceUtil.ConstructorUtils.GetConstructor(type, ConstructorConventionsSequence.First);
 
                 var parameters = InstanceUtil.ParametersUtil.Map(new[] { typeArg1 });
 

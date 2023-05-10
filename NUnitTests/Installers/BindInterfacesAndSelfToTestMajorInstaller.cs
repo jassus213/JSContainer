@@ -5,16 +5,14 @@ using JSInjector.Tests;
 
 namespace NUnitTests.Installers
 {
-    public class BindTo : MajorInstaller
+    public class BindInterfacesAndSelfToTestMajorInstaller : MajorInstaller
     {
         public override void Install()
         {
-            base.Install(); 
-            Container.BindSelfTo<Foo>().AsSingleton();
-            Container.Bind<IFoo>().To<Foo>();
-            Container.BindSelfTo<Bar>().AsSingleton();
-            Container.Bind<IBar>().To<Bar>();
+            base.Install();
             Container.BindInterfacesAndSelfTo<Test>().AsSingleton();
+            Container.BindInterfacesAndSelfTo<Foo>().AsTransient();
+            Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
             Container.Initialize();
         }
     }
