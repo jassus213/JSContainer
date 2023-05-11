@@ -1,0 +1,18 @@
+﻿using JSInjector.Installers;
+using JSInjector.Installers.MajorInstaller;
+using JSInjector.Tests;
+using TestFramework.Entity;
+
+namespace NUnitTests.GitHub
+{
+    public class GitHubIntroduce : MajorInstaller
+    {
+        public override void Install()
+        {
+            base.Install();
+            Container.BindInterfacesAndSelfTo<Bar>();
+            Container.BindInterfacesAndSelfTo<Foo>();
+            Container.Initialize();
+        }
+    }
+}

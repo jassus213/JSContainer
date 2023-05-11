@@ -1,4 +1,4 @@
-﻿# CircularDependency
+﻿# Circular Dependency
 
 ## Choosing an algorithm to search for cyclic dependence
 
@@ -7,9 +7,9 @@ rather heavy algorithm with complexity O(n²) turned out. If this really serious
 I plan to either rewrite this algorithm or make a feature in which it will be possible to indicate during binding that
 verification is not required for heavy objects
 
-***But at the moment I have come to two options for searching for a cyclic dependency***
+***But at the moment I have come to two options for searching a Circular dependency***
 
-### First solution
+## First solution
 
 At the input, we get Bind Information of each parameter for a specific instance, in turn, Bind Information has a list of
 ParametersExpression,
@@ -29,7 +29,7 @@ internal static bool HasCircularDependency(IEnumerable<BindInformation> paramete
             }
 ```
 
-# Second Solution
+## Second Solution
 
 Here we do not know in what form a specific parameter will come to us, so we have to do an interface check and look for
 a class with its implementation, fortunately we are looking in the dictionary, so here the complexity remains O(1). When

@@ -5,7 +5,7 @@ namespace JSInjector.Installers.MajorInstaller
 {
     public abstract class MajorInstaller : IMajorInstaller
     {
-        protected DiContainer Container => _container;
+        public DiContainer Container => _container;
         private readonly DiContainer _container = new DiContainer();
 
         public virtual void Install()

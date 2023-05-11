@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using JSInjector.Binding.BindInfo;
 using JSInjector.Common.Enums;
@@ -44,7 +45,7 @@ namespace JSInjector
                 var instance = bindInformation.ArgumentsMap[currentType];
                 return instance;
             }
-            
+
 
             if (InstanceUtil.ParametersUtil.HasCircularDependency(container.ContractsInfo, type,
                     InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
