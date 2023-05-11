@@ -1,3 +1,5 @@
+using System;
+
 namespace JSInjector.Tests
 {
     public class Foo : IFoo
@@ -8,6 +10,7 @@ namespace JSInjector.Tests
         public Foo(DiContainer diContainer)
         {
             DiContainer = diContainer;
+            Guid = System.Guid.NewGuid().ToString();
         }
 
         public string PrintGUID()

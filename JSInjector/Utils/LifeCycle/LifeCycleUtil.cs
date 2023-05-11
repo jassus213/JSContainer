@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using JSInjector.JSExceptions;
 
-namespace JSInjector.Utils
+namespace JSInjector.Utils.LifeCycle
 {
     internal static class LifeCycleUtil
     {

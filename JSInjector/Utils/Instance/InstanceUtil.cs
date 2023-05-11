@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using JSInjector.Binding.BindInfo;
 using JSInjector.JSExceptions;
+using JSInjector.Tests.CircularDependency;
+using JSInjector.Tests.CircularDependency.EfficiencyTest;
 using JSInjector.Utils.Instance;
 
 namespace JSInjector.Utils
@@ -48,10 +51,11 @@ namespace JSInjector.Utils
 
         internal static class ParametersUtil
         {
-            internal static bool HasCircularDependency(Dictionary<Type, IEnumerable<Type>> contractsInfo, Type type,
-                IEnumerable<ParameterExpression> parameterExpressions)
+            internal static bool HasCircularDependency(Dictionary<Type, IEnumerable<Type>> contractsInfo,
+                Type instanceType,
+                IEnumerable<ParameterExpression> parameterExpressionsOfInstance)
             {
-                foreach (var param in parameterExpressions)
+                foreach (var param in parameterExpressionsOfInstance)
                 {
                     var paramType = param.Type;
                     if (param.Type.IsInterface && contractsInfo.ContainsKey(param.Type))
@@ -60,10 +64,10 @@ namespace JSInjector.Utils
                     }
 
                     var parametersOfParam = GetParametersExpression(paramType);
-                    var map = Map(new[] { type }).First();
+                    var map = Map(new[] { instanceType }).First();
                     if (parametersOfParam.Where(x => x.Type == map.Type).ToArray().Length != 0)
                     {
-                        throw JsExceptions.BindException.CircularDependency(type, paramType);
+                        throw JsExceptions.BindException.CircularDependency(instanceType, paramType);
                     }
                 }
 

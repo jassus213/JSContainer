@@ -3,7 +3,7 @@ using JSInjector.Factories;
 
 namespace JSInjector.Tests
 {
-    public class TestFactory : Factory, IFactory<Test>
+    public class TestFactory : Factory, IFactory<TestClass>
     {
         private readonly IContainer _diContainer;
         
@@ -12,7 +12,7 @@ namespace JSInjector.Tests
             _diContainer = diContainer;
         }
         
-        public Test Create()
+        public TestClass Create()
         {
             //var result = new Test(new Bar(new DiContainer()), new Foo(new DiContainer()), new DiContainer());
             //Create(_diContainer, result);

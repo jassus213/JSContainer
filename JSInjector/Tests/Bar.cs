@@ -13,7 +13,8 @@ namespace JSInjector.Tests
             Foo = foo;
             DiContainer = diContainer;
             Guid = System.Guid.NewGuid().ToString();
-        }
+            Foo.PrintGUID();
+        }   
 
         public string PrintGUID()
         {

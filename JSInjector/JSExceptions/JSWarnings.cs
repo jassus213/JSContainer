@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using NUnit.Framework;
 
 namespace JSInjector.JSExceptions
 {
@@ -22,7 +21,6 @@ namespace JSInjector.JSExceptions
                 foreach (var constructor in constructorInfos)
                 {
                     var msg = $"One of the constructors : {constructor}";
-                    Assert.Warn(msg);
                 }
             }
         }
