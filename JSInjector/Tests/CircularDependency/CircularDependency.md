@@ -65,7 +65,7 @@ internal static bool HasCircularDependency(Dictionary<Type, IEnumerable<Type>> c
 At the moment, I chose the second algorithm, it turned out to be faster in testing. Check the tests by date in the Json
 file
 
-* 11.05.2023 [JsonFile](https://github.com/jassus213/JSInjector/tree/main/JSInjector/Tests/CircularDependency\EfficiencyTest\EffiencyTestsCd.json);
+* 11.05.2023 [JsonFile](https://github.com/jassus213/JSInjector/blob/main/JSInjector/Tests/CircularDependency/EfficiencyTest/EffiencyTestsCd.json);
 
 
 
