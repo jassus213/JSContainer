@@ -8,10 +8,10 @@ namespace JsInjectorTest.Installers.AddizionaleTest
 {
     public class AddizionaleInstallerTest : Installer<AddizionaleInstallerTest>
     {
-        protected override void InstallBindings(IContainer diContainer)
+        protected override void InstallBindings(IContainer container)
         {
-            diContainer.BindInterfacesAndSelfTo<TestClass>().AsSingleton();
-            diContainer.Initialize();
+            container.BindInterfacesAndSelfTo<TestClass>().AsSingleton();
+            container.Initialize();
         }
     }
 }

@@ -6,10 +6,10 @@ namespace ConsoleExample.Commands.Installer
 {
     public class CommandsInstaller : Installer<CommandsInstaller>
     {
-        protected override void InstallBindings(IContainer diContainer)
+        protected override void InstallBindings(IContainer container)
         {
-            diContainer.BindInterfacesAndSelfTo<AddEmployeeCommand>().AsSingleton();
-            diContainer.Initialize();
+            container.BindInterfacesAndSelfTo<AddEmployeeCommand>().AsSingleton();
+            container.BindInterfacesAndSelfTo<FindEmployeeCommand>().AsSingleton();
         }
     }
 }

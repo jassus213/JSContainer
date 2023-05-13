@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using ConsoleExample.Services.Installers;
 using ICommand = ConsoleExample.Commands.Common.ICommand;
 
@@ -11,15 +11,12 @@ namespace ConsoleExample
         {
             var mainInstaller = new MainInstaller();
             mainInstaller.Install();
+            
+            mainInstaller.Container.Initialize();
 
             var commands = mainInstaller.Container.ResolveAll<ICommand>();
 
-            var commandsMap = new Dictionary<string, Action>();
-
-            foreach (var command in commands)
-            {
-                commandsMap.Add(command.CommandName, () => command.Execute());
-            }
+            var commandsMap = commands.ToDictionary<ICommand, string, Action>(command => command.CommandName, command => command.Execute);
 
             while (true)
             {

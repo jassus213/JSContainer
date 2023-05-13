@@ -10,11 +10,9 @@ namespace JSInjector.Binding.BindInfo
     {
         internal readonly DiContainer CurrentContainer;
         internal LifeCycle LifeCycle;
-        internal List<ParameterExpression> ParameterExpressions => _parameterExpressions;
-        private readonly List<ParameterExpression> _parameterExpressions = new List<ParameterExpression>();
+        internal Dictionary<Type, ParameterExpression> ParameterExpressions => _parameterExpressions;
+        private readonly Dictionary<Type, ParameterExpression> _parameterExpressions = new Dictionary<Type, ParameterExpression>();
         internal readonly InstanceType InstanceType;
-        internal IReadOnlyDictionary<Type, Type> ContractsMap => _contractsMap;
-        private readonly Dictionary<Type, Type> _contractsMap = new Dictionary<Type, Type>();
         internal List<Type> ContractsTypes => _contractsType;
         private readonly List<Type> _contractsType = new List<Type>();
 

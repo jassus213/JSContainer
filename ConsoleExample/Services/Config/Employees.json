@@ -1,12 +1,12 @@
 [
   {
+    "Id": "2724f3fb-2ab0-4be5-9387-771d06e11222",
     "Name": "Nikita",
-    "LastName": "Okhotnikov",
-    "Id": "17632db0-cdae-4c31-8221-ca54b16bd29c"
+    "LastName": "Okhotnikov"
   },
   {
+    "Id": "000f5ca0-2bb4-4cf5-bf15-6c983f930b99",
     "Name": "Dasha",
-    "LastName": "Kapustyan",
-    "Id": "672341e8-715e-4ca1-901c-cec8f7eaf81b"
+    "LastName": "Kapustyan"
   }
 ]

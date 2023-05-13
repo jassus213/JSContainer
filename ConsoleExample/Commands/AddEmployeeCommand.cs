@@ -1,7 +1,7 @@
 ﻿using System;
-using ConsoleExample.Entity;
-using ConsoleExample.Services;
+using ConsoleExample.Services.Common;
 using ConsoleExample.Services.Employee.Entity;
+using ConsoleExample.Services.Employee.Factory;
 using ICommand = ConsoleExample.Commands.Common.ICommand;
 
 namespace ConsoleExample.Commands
@@ -23,11 +23,7 @@ namespace ConsoleExample.Commands
             var name = Console.ReadLine();
             var lastName = Console.ReadLine();
 
-            var entity = new EmployeeEntity
-            {
-                Name = name,
-                LastName = lastName,
-            };
+            var entity = EmployeeFactory.Create(name, lastName);
 
             _jsonWriter.WriteToFile(entity);
         }

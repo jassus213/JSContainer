@@ -16,7 +16,7 @@
 
     public interface IFactory<in TParam1, in TParam2, out TValue> : IFactory where TValue : new()
     {
-        TValue Create(TParam1 param1, TParam2 param2);
+        TValue Create(TParam1 name, TParam2 lastName);
     }
 
     public interface IFactory<in TParam1, in TParam2, in TParam3, out TValue> : IFactory where TValue : new() 

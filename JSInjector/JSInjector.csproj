@@ -40,6 +40,7 @@
       <Compile Include="Binding\BindInfo\BindInfoManager.cs" />
       <Compile Include="Binding\BindInfo\FactoryBindInfo.cs" />
       <Compile Include="Binding\BindInfo\Factory\BindInfoFactory.cs" />
+      <Compile Include="Binding\ConcreteBindersFactory.cs" />
       <Compile Include="Binding\ConcreteIdBinder.cs" />
       <Compile Include="Binding\ConcreteIdLifeCycle.cs" />
       <Compile Include="Binding\LifeCycleExtension.cs" />
@@ -47,6 +48,9 @@
       <Compile Include="Common\Enums\BindType.cs" />
       <Compile Include="Common\Enums\InstanceType.cs" />
       <Compile Include="Common\Enums\LifeCycle.cs" />
+      <Compile Include="Common\Tree\ScopeTree.cs" />
+      <Compile Include="Common\Tree\TreeFactory.cs" />
+      <Compile Include="Common\Tree\TreeManager.cs" />
       <Compile Include="Common\TypeInstancePair\TypeInstancePair.cs" />
       <Compile Include="Common\TypeInstancePair\TypeInstancePairFactory.cs" />
       <Compile Include="Contracts\IContainer.cs" />
@@ -60,7 +64,6 @@
       <Compile Include="Factories\IFactory.cs" />
       <Compile Include="FactoryInitializer.cs" />
       <Compile Include="Installers\AddizionaleInstaller\AddizionaleInstaller.cs" />
-      <Compile Include="Installers\AddizionaleInstaller\IAddizionaleInstaller.cs" />
       <Compile Include="Installers\Installer.cs" />
       <Compile Include="Installers\MajorInstaller\IMajorInstaller.cs" />
       <Compile Include="Installers\MajorInstaller\MajorInstaller.cs" />

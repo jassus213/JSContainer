@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ConsoleExample.Entity;
+using ConsoleExample.Services.Common;
 using ConsoleExample.Services.Employee.Entity;
 using Newtonsoft.Json;
 
@@ -20,10 +20,10 @@ namespace ConsoleExample.Services.Employee
             var employees = _employeeReader.ReadFile();
             if (employees == null)
                 employees = new List<EmployeeEntity>();
-            
+
             employees.Add(entity);
-            var jsonString = JsonConvert.SerializeObject(employees, Formatting.Indented);
-            File.WriteAllText(EmployeeDataInfo.Path, jsonString);
+            var jsonString = JsonConvert.SerializeObject(employees, EmployeeJsonSettings.Formatting);
+            File.WriteAllText(EmployeeJsonSettings.Path, jsonString);
         }
     }
 }

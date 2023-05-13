@@ -15,8 +15,6 @@ namespace JSInjector
         {
             if (!currentContainer.ContainerInfo.ContainsKey(type) && !type.IsInterface)
             {
-                currentContainer.BindQueue.Enqueue(
-                    new KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>(type, keyValuePair));
                 currentContainer.ContainerInfo.Add(type, keyValuePair);
                 currentContainer.BindInfoMap.Add(type, bindInformation);
                 return;
@@ -28,7 +26,6 @@ namespace JSInjector
         internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindType bindType,
             KeyValuePair<bool, TypeInstancePair> keyValuePair, LifeCycle lifeCycle)
         {
-            currentContainer.BindQueue.Dequeue();
             var bindInfo = BindInfoFactory.Create(type, bindType, InstanceType.Default, currentContainer, lifeCycle);
             RewriteContainerInfo(ref currentContainer.ContainerInfo, type, keyValuePair);
             RewriteBindInfo(ref currentContainer.BindInfoMap, type, bindInfo);
@@ -63,8 +60,7 @@ namespace JSInjector
                 throw JsExceptions.BindException.NotBindedException(type);
             }
             
-            bindInformationMap.Remove(type);
-            bindInformationMap.Add(type, bindInformation);
+            bindInformationMap[type] = bindInformation;
         }
 
         private static void RewriteContainerInfo(ref Dictionary<Type, KeyValuePair<bool, TypeInstancePair>> containerInfo, Type type,
@@ -75,9 +71,7 @@ namespace JSInjector
                 throw JsExceptions.BindException.NotBindedException(type);
             }
 
-            var currentTypeInstancePair = containerInfo[type].Value;
-            containerInfo.Remove(type);
-            containerInfo.Add(type, keyValuePair);
+            containerInfo[type] = keyValuePair;
         }
     }
 }

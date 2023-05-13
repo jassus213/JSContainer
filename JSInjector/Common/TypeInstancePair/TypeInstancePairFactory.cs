@@ -11,10 +11,5 @@ namespace JSInjector.Common.TypeInstancePair
 
         public static readonly Func<Type, object, TypeInstancePair> CreatePairWithCurrentType = (instanceType, instance) =>
             new TypeInstancePair(instanceType, instance);
-
-        public static IReadOnlyCollection<TypeInstancePair> CreatInstancePairs(IReadOnlyCollection<object> instances)
-        {
-            return instances.Select(x => CreatePair(x)).ToArray();
-        }
     }
 }

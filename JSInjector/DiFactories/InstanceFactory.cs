@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using JSInjector.Common.TypeInstancePair;
-using JSInjector.Utils;
+using JSInjector.Utils.Instance;
 
 namespace JSInjector.DiFactories
 {
     internal static class InstanceFactory
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TConcrete>(ConstructorInfo constructorInfo, DiContainer diContainer)
         {
             var func = FunctionFactory.CreateFunc<TConcrete>(constructorInfo);
@@ -20,7 +17,6 @@ namespace JSInjector.DiFactories
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TConcrete>(ConstructorInfo constructorInfo,
             DiContainer diContainer) where TConcrete : class where TArg1 : class
         {
@@ -29,11 +25,10 @@ namespace JSInjector.DiFactories
             var instance = func.Invoke((TArg1)DiContainerManager.SearchInstance<TArg1, TConcrete>(diContainer));
             diContainer.ReWriteInstanceInfo(typeof(TConcrete),
                 diContainer.BindInfoMap[typeof(TConcrete)],
-                    new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance)));
+                new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance)));
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TConcrete>(ConstructorInfo constructorInfo,
             DiContainer diContainer) where TConcrete : class where TArg1 : class where TArg2 : class
         {
@@ -47,7 +42,6 @@ namespace JSInjector.DiFactories
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TConcrete>(ConstructorInfo constructorInfo,
             DiContainer diContainer) where TConcrete : class where TArg1 : class where TArg2 : class where TArg3 : class
         {
@@ -62,7 +56,6 @@ namespace JSInjector.DiFactories
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TArg4, TConcrete>(ConstructorInfo constructorInfo,
             DiContainer diContainer) where TConcrete : class
             where TArg2 : class
@@ -82,7 +75,6 @@ namespace JSInjector.DiFactories
             return instance;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static TConcrete CreateInstance<TArg1, TArg2, TArg3, TArg4, TArg5, TConcrete>(
             ConstructorInfo constructorInfo,
             DiContainer diContainer) where TConcrete : class

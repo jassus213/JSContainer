@@ -1,4 +1,4 @@
-﻿using ConsoleExample.Entity;
+﻿using System;
 using ConsoleExample.Services.Common;
 using ConsoleExample.Services.Employee.Entity;
 
@@ -6,6 +6,6 @@ namespace ConsoleExample.Services.Employee
 {
     public interface IEmployeeReader : IJsonReader<EmployeeEntity>
     {
-        EmployeeEntity FindEntityById(int id);
+        EmployeeEntity FindEntity(string predicate);
     }
 }

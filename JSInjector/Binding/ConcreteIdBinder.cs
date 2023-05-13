@@ -23,7 +23,7 @@ namespace JSInjector.Binding
         {
             var type = typeof(TConcrete);
             var contractType = typeof(TContract);
-            if (contractType.IsInterface && !DiContainer.BindInfoMap[type].ContractsTypes.Contains(contractType))
+            if (contractType.IsInterface && !_bindInformation.ContractsTypes.Contains(contractType))
             {
                 DiContainer.BindInfoMap[type].AddContracts(new[] { contractType });
                 if (DiContainer.ContractsInfo.ContainsKey(contractType))

@@ -1,19 +1,14 @@
-﻿using System.Diagnostics;
-using JSInjector.Tests;
-
-namespace TestFramework.Entity
+﻿namespace TestFramework.Entity
 {
     public class Test1
     {
-        public readonly IBar Bar;
+        public readonly TestScope1 TestScope1;
         public readonly IFoo Foo;
 
-        public Test1(IFoo foo, IBar bar)
+        public Test1(IFoo foo, TestScope1 testScope1)
         {
             Foo = foo;
-            Bar = bar;
-
-            Debug.WriteLine($"{GetType().Name} : Bar Guid is {Bar.PrintGUID()}, Foo Guid is {Foo.PrintGUID()}");
+            TestScope1 = testScope1;
         }
     }
 }

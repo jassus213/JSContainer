@@ -14,7 +14,7 @@
 
         public static void AsScoped<TContract>(this ConcreteIdBinder<TContract> concreteIdBinder)
         {
-            new ConcreteIdLifeCycle<TContract>(concreteIdBinder.DiContainer).AsSingleton();
+            new ConcreteIdLifeCycle<TContract>(concreteIdBinder.DiContainer).AsScoped();
         }
     }
 }

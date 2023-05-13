@@ -1,27 +1,21 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using JSInjector.Contracts;
-using JSInjector.Tests;
 
 namespace TestFramework.Entity
 {
-    public class TestClass : IDisposable
+    public class TestClass
     {
         public readonly IContainer DiContainer;
-        public readonly IBar Bar;
         public readonly IFoo Foo;
+        public readonly AnotherScope AnotherScope;
 
-        public TestClass(IBar bar, IFoo foo, IContainer diContainer)
+        public TestClass(IFoo foo, IContainer diContainer, AnotherScope anotherScope)
         {
-            Bar = bar;
             Foo = foo;
             DiContainer = diContainer;
+            AnotherScope = anotherScope;
 
-            Debug.WriteLine($"{GetType().Name} : Bar Guid is {Bar.PrintGUID()}, Foo Guid is {Foo.PrintGUID()}");
-        }
-
-        public void Dispose()
-        {
+            Debug.WriteLine($"{GetType().Name}, Foo Guid is {Foo.PrintGUID()}");
         }
     }
 }

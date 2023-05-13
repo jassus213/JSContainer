@@ -1,4 +1,4 @@
-﻿namespace ConsoleExample.Entity
+﻿namespace ConsoleExample.Services.Employee.Entity
 {
     public interface IJsonEntity
     {

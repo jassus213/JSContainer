@@ -4,6 +4,6 @@ namespace JSInjector.Installers.AddizionaleInstaller
 {
     public abstract class AddizionaleInstaller
     {
-        protected abstract void InstallBindings(IContainer diContainer);
+        protected abstract void InstallBindings(IContainer container);
     }
 }

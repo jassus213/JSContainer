@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using JSInjector.Binding.BindInfo;
 using JSInjector.JSExceptions;
-using JSInjector.Tests.CircularDependency;
-using JSInjector.Tests.CircularDependency.EfficiencyTest;
-using JSInjector.Utils.Instance;
 
-namespace JSInjector.Utils
+namespace JSInjector.Utils.Instance
 {
     internal static class InstanceUtil
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsInterfaceAndBinded(Type type, DiContainer container)
         {
             if (type.IsInterface && container.ContractsInfo.ContainsKey(type))
@@ -31,6 +29,7 @@ namespace JSInjector.Utils
             return false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool IsInterfaceAndBinded(Type type, ref Dictionary<Type, IEnumerable<Type>> contractsInfo,
             ref Dictionary<Type, BindInformation> bindInformationMap)
         {
@@ -51,21 +50,20 @@ namespace JSInjector.Utils
 
         internal static class ParametersUtil
         {
-            internal static bool HasCircularDependency(Dictionary<Type, IEnumerable<Type>> contractsInfo,
+            internal static bool HasCircularDependency(DiContainer container,
                 Type instanceType,
-                IEnumerable<ParameterExpression> parameterExpressionsOfInstance)
+                IReadOnlyCollection<Type> parameterExpressionsOfInstance)
             {
                 foreach (var param in parameterExpressionsOfInstance)
                 {
-                    var paramType = param.Type;
-                    if (param.Type.IsInterface && contractsInfo.ContainsKey(param.Type))
+                    var paramType = param;
+                    if (param.IsInterface && container.ContractsInfo.ContainsKey(paramType))
                     {
-                        paramType = contractsInfo[param.Type].Last();
+                        paramType = container.ContractsInfo[paramType].Last();
                     }
 
-                    var parametersOfParam = GetParametersExpression(paramType);
-                    var map = Map(new[] { instanceType }).First();
-                    if (parametersOfParam.Where(x => x.Type == map.Type).ToArray().Length != 0)
+                    var parametersOfParam = container.BindInfoMap[paramType].ParameterExpressions.Keys;
+                    if (parametersOfParam.Count(x => x == instanceType) != 0)
                     {
                         throw JsExceptions.BindException.CircularDependency(instanceType, paramType);
                     }

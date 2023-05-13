@@ -27,7 +27,6 @@ namespace JSInjector.Binding
         public void AsScoped()
         {
             _diContainer.BindInfoMap[typeof(TConcrete)].LifeCycle = LifeCycle.Scoped;
-            _diContainer.ScopedInstance.Add(typeof(TConcrete), new Dictionary<Type, object>());
         }
     }
 }

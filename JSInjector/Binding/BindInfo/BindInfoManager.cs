@@ -23,18 +23,30 @@ namespace JSInjector.Binding.BindInfo
             BindSelf(bindInformation);
         }
 
-        internal static void BindInterfacesTo(this BindInformation bindInformation, ref Dictionary<Type, IEnumerable<Type>> contractsType)
+        internal static void BindInterfacesTo(this BindInformation bindInformation,
+            ref Dictionary<Type, IEnumerable<Type>> contractsType)
         {
             var contracts = InstanceUtil.ContractsUtil.GetContractsExpression(bindInformation.CurrentType);
-            foreach (var contract in contracts)
+            if (contracts.Any())
             {
-                contractsType.Add(contract, new[] { bindInformation.CurrentType });
+                foreach (var contract in contracts)
+                {
+                    if (contractsType.ContainsKey(contract))
+                    {
+                        var enumerable = contractsType[contract].Append(bindInformation.CurrentType);
+                        contractsType[contract] = enumerable;
+                    }
+                    else
+                        contractsType.Add(contract, new[] { bindInformation.CurrentType });
+                }
+                
+                bindInformation.AddContracts(contracts);
             }
-
-            bindInformation.AddContracts(contracts);
+            
         }
 
-        internal static void BindInterfacesAndSelfTo(this BindInformation bindInformation, ref Dictionary<Type, IEnumerable<Type>> contractsType)
+        internal static void BindInterfacesAndSelfTo(this BindInformation bindInformation,
+            ref Dictionary<Type, IEnumerable<Type>> contractsType)
         {
             BindSelf(bindInformation);
             BindInterfacesTo(bindInformation, ref contractsType);

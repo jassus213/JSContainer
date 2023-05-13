@@ -1,5 +1,4 @@
-﻿using JSInjector.Binding.BindInfo;
-using JSInjector.Common.Enums;
+﻿using JSInjector.Common.Enums;
 
 namespace JSInjector.Installers.MajorInstaller
 {

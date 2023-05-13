@@ -1,18 +1,20 @@
 ﻿using JSInjector.Binding;
 using JSInjector.Installers.MajorInstaller;
-using JSInjector.Tests;
 using TestFramework.Entity;
 
-namespace NUnitTests.Installers
+namespace TestFramework.Installers
 {
     public class BindInterfacesAndSelfToTestMajorInstaller : MajorInstaller
     {
         public override void Install()
         {
             base.Install();
+            Container.BindInterfacesAndSelfTo<AnotherScope>().AsSingleton();
+            Container.BindInterfacesAndSelfTo<Test1>().AsSingleton();
+            Container.BindInterfacesAndSelfTo<Foo>().AsScoped();
             Container.BindInterfacesAndSelfTo<TestClass>().AsSingleton();
-            Container.BindInterfacesAndSelfTo<Foo>().AsTransient();
             Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
+            Container.BindInterfacesAndSelfTo<TestScope1>().AsSingleton();
             Container.Initialize();
         }
     }

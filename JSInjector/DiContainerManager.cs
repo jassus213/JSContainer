@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using JSInjector.Binding.BindInfo;
 using JSInjector.Common.Enums;
+using JSInjector.Common.Tree;
 using JSInjector.JSExceptions;
-using JSInjector.Service;
-using JSInjector.Utils;
+using JSInjector.Services;
 using JSInjector.Utils.Instance;
 using JSInjector.Utils.LifeCycle;
 
@@ -37,6 +34,8 @@ namespace JSInjector
                 bindInformation = container.BindInfoMap[currentType];
             }
 
+            TreeManager.InitializeTree(container, typeConcrete);
+
 
             if (container.BindInfoMap[typeConcrete].ArgumentsMap
                 .ContainsKey(currentType)) // Get argument from TConcrete
@@ -47,19 +46,41 @@ namespace JSInjector
             }
 
 
-            if (InstanceUtil.ParametersUtil.HasCircularDependency(container.ContractsInfo, type,
-                    InstanceUtil.ParametersUtil.GetParametersExpression(currentType)))
+            if (InstanceUtil.ParametersUtil.HasCircularDependency(container, type,
+                    container.BindInfoMap[currentType].ParameterExpressions.Keys.ToList()))
                 return null;
 
-            if (bindInformation!.LifeCycle == LifeCycle.Singleton &&
-                container.IsSingletonInstanced(currentType))
+
+            if (bindInformation!.LifeCycle == LifeCycle.Singleton)
             {
+                if (!container.IsSingletonInstanced(currentType))
+                {
+                    var genericMethod = InstanceFactoryService.FindMethod(container, currentType);
+                    var instance = genericMethod.Invoke(null,
+                        new object[]
+                        {
+                            InstanceUtil.ConstructorUtils.GetConstructor(currentType,
+                                ConstructorConventionsSequence.First),
+                            container
+                        });
+                    
+                    return instance;
+                }
+
                 return container.ContainerInfo[currentType].Value.Instance;
             }
 
-            if (bindInformation!.LifeCycle == LifeCycle.Singleton &&
-                !container.IsSingletonInstanced(currentType))
+
+            if (bindInformation!.LifeCycle == LifeCycle.Scoped)
             {
+                var keyValuePair = container.ScopedTree.First(x => x.Key.Contains(typeConcrete));
+                var scopeTree = keyValuePair.Value;
+
+                if (scopeTree.ScopeInstance != null)
+                {
+                    return scopeTree.ScopeInstance;
+                }
+
                 var genericMethod = InstanceFactoryService.FindMethod(container, currentType);
                 var instance = genericMethod.Invoke(null,
                     new object[]
@@ -67,28 +88,9 @@ namespace JSInjector
                         InstanceUtil.ConstructorUtils.GetConstructor(currentType, ConstructorConventionsSequence.First),
                         container
                     });
-                return instance;
-            }
 
+                container.ScopedTree[keyValuePair.Key].InitializeObject(instance);
 
-            if (bindInformation!.LifeCycle == LifeCycle.Scoped &&
-                LifeCycleUtil.IsScopedInstanced(ref container.ScopedInstance, currentType, typeConcrete))
-            {
-                var instance = container.ScopedInstance[currentType][typeConcrete];
-                return instance;
-            }
-
-            if (bindInformation!.LifeCycle == LifeCycle.Scoped &&
-                !LifeCycleUtil.IsScopedInstanced(ref container.ScopedInstance, currentType, typeConcrete))
-            {
-                var genericMethod = InstanceFactoryService.FindMethod(container, currentType);
-                var instance = genericMethod.Invoke(null,
-                    new object[]
-                    {
-                        InstanceUtil.ConstructorUtils.GetConstructor(currentType, ConstructorConventionsSequence.First),
-                        container
-                    });
-                container.ScopedInstance[currentType].Add(typeConcrete, instance);
                 return instance;
             }
 

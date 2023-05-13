@@ -1,6 +1,6 @@
-﻿using ConsoleExample.Entity;
+﻿using ConsoleExample.Services.Employee.Entity;
 
-namespace ConsoleExample.Services
+namespace ConsoleExample.Services.Common
 {
     public interface IJsonWriter<in TEntity> where TEntity : IJsonEntity
     {
