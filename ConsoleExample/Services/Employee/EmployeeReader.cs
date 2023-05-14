@@ -51,20 +51,5 @@ namespace ConsoleExample.Services.Employee
                     throw new NullReferenceException($"Employee Sequence is null");
             }
         }
-
-        public static IEnumerable<TResult> FindEntityNew<TResult, TSource>(this IEnumerable<TSource> sourceEnumerable,
-            Func<TSource, TResult> selector)
-        {
-            var result = new List<TResult>();
-            
-            foreach (var source in sourceEnumerable)
-            {
-                var selectorResult = selector(source);
-                if (selectorResult != null)
-                    result.Add(selectorResult);
-            }
-
-            return result.ToArray();
-        }
     }
 }

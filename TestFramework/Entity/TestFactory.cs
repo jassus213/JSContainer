@@ -1,5 +1,5 @@
-﻿using JSInjector.Contracts;
-using JSInjector.Factories;
+﻿using JSContainer.Contracts;
+using JSContainer.Factories;
 
 namespace TestFramework.Entity
 {

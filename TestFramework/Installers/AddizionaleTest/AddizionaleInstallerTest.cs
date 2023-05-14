@@ -1,7 +1,7 @@
-using JSInjector.Binding;
-using JSInjector.Contracts;
-using JSInjector.Installers;
-using JSInjector.Tests;
+using JSContainer.Binding;
+using JSContainer.Contracts;
+using JSContainer.Installers;
+using JSContainer.Tests;
 using TestFramework.Entity;
 
 namespace JsInjectorTest.Installers.AddizionaleTest

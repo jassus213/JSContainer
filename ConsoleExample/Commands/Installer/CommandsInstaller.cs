@@ -1,6 +1,6 @@
-﻿using JSInjector.Binding;
-using JSInjector.Contracts;
-using JSInjector.Installers;
+﻿using JSContainer.Binding;
+using JSContainer.Contracts;
+using JSContainer.Installers;
 
 namespace ConsoleExample.Commands.Installer
 {

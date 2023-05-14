@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using JSInjector.Contracts;
+using JSContainer.Contracts;
 
 namespace TestFramework.Entity
 {

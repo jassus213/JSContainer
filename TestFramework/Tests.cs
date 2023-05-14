@@ -1,5 +1,5 @@
 ﻿using System;
-using JSInjector.Tests.CircularDependency.EfficiencyTest;
+using JSContainer.Tests.CircularDependency.EfficiencyTest;
 using NUnit.Framework;
 using TestFramework.Entity;
 using TestFramework.Installers;
@@ -23,15 +23,21 @@ namespace TestFramework
 
             var bar = installer.Container.Resolve<Bar>();
             var test1 = installer.Container.Resolve<Test1>();
-            
-            if (bar.Foo == test1.TestScope1.Foo && bar.Foo == test1.Foo)
-                Console.WriteLine(true);
+
+            Assert.AreEqual(bar.Foo, test1.TestScope1.Foo);
+            Assert.AreEqual(bar.Foo, test1.Foo);
 
             var testClass = installer.Container.Resolve<TestClass>();
             var anotherScope = installer.Container.Resolve<AnotherScope>();
-            
+
             if (testClass.Foo == anotherScope.Foo)
                 Console.WriteLine(true);
+
+            Assert.AreEqual(testClass.Foo, anotherScope.Foo);
+
+            var anotherScope2 = installer.Container.Resolve<AnotherScope2>();
+            
+            Assert.AreNotEqual(anotherScope2.Foo, bar.Foo);
         }
     }
 }

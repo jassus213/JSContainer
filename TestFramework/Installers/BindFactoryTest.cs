@@ -1,7 +1,7 @@
 ﻿using System;
-using JSInjector.Installers;
-using JSInjector.Installers.MajorInstaller;
-using JSInjector.Tests;
+using JSContainer.Installers;
+using JSContainer.Installers.MajorInstaller;
+using JSContainer.Tests;
 using TestFramework.Entity;
 
 namespace NUnitTests.Installers

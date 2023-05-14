@@ -60,9 +60,9 @@
         <Compile Include="Services\Installers\MainInstaller.cs" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\JSInjector\JSInjector.csproj">
+      <ProjectReference Include="..\JSContainer\JSContainer.csproj">
         <Project>{cb1e48d3-5dcf-4194-941a-59ecd2c96bcc}</Project>
-        <Name>JSInjector</Name>
+        <Name>JSContainer</Name>
       </ProjectReference>
     </ItemGroup>
     <ItemGroup>

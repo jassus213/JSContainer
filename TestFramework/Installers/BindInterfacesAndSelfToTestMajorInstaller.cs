@@ -1,5 +1,5 @@
-﻿using JSInjector.Binding;
-using JSInjector.Installers.MajorInstaller;
+﻿using JSContainer.Binding;
+using JSContainer.Installers.MajorInstaller;
 using TestFramework.Entity;
 
 namespace TestFramework.Installers
@@ -15,6 +15,7 @@ namespace TestFramework.Installers
             Container.BindInterfacesAndSelfTo<TestClass>().AsSingleton();
             Container.BindInterfacesAndSelfTo<Bar>().AsSingleton();
             Container.BindInterfacesAndSelfTo<TestScope1>().AsSingleton();
+            Container.BindInterfacesAndSelfTo<AnotherScope2>().AsSingleton();
             Container.Initialize();
         }
     }

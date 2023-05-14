@@ -1,7 +1,7 @@
 ﻿using ConsoleExample.Commands.Installer;
 using ConsoleExample.Services.Employee;
-using JSInjector.Binding;
-using JSInjector.Installers.MajorInstaller;
+using JSContainer.Binding;
+using JSContainer.Installers.MajorInstaller;
 
 namespace ConsoleExample.Services.Installers
 {
