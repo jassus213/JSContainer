@@ -335,3 +335,21 @@ container.BindSelfTo<MyService>().AsTransient();
 container.Bind<IMyService>().To<MyService>().AsTransient();
 ```
 In this example, the IMyService interface is registered with its implementation MyService as Transient using Bind<TInterface>().To<TImplementation>().AsTransient(). This ensures that whenever IMyService is resolved, a new instance of MyService will be created.
+
+## <a id="resolving"/> Resolving
+Resolving dependencies from a DI container is a fundamental aspect of using dependency injection. By utilizing the container's Resolve<T>() and ResolveAll<T>() methods, you can obtain instances of registered dependencies, either individually or as collections. The container takes care of automatically resolving all required dependencies, simplifying the process of managing complex dependency graphs.
+
+Understanding how to effectively resolve dependencies allows you to leverage the power of DI containers and build modular and flexible applications with ease.
+### <a id="resolve"/> Resolve
+***Using Resolve<T>()***
+The most common way to resolve a dependency is by using the Resolve<T>() method provided by the DI container. This method accepts the type parameter T representing the type of the dependency to be resolved and returns an instance of that type.
+```c#
+var myDependency = container.Resolve<IMyDependency>();
+```
+In this example, the IMyDependency interface is resolved from the container, and an instance of the registered implementation is returned. The resolved instance can then be used to access the functionality provided by the dependency.
+### <a id="resolveall"/> ResolveAll
+Sometimes, there is a need to resolve multiple dependencies at once. This can be achieved using the ResolveAll<T>() method provided by the container. This method returns a collection of instances that implement the specified type T.
+```c#
+var myDependencies = container.ResolveAll<IMyDependency>();
+```
+In this example, all implementations of the IMyDependency interface registered in the container are resolved and returned as a collection. This allows you to work with multiple instances of the same type, which can be useful in scenarios such as event aggregators or plugin architectures.
