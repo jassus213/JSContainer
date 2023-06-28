@@ -1,10 +1,15 @@
 # JS Container Documentation
 ## Introduction
 This documentation provides an overview of the DI (Dependency Injection) Container, its functionality, and how to use it effectively in your application. The DI Container simplifies the management and resolution of dependencies within your codebase.
+### Last Version : 1.0.0
 
 
 ## Map
 - ### Lets Start
+    - [Installation](#install)
+        - [.NET CLI](#installcli)
+        - [NuGet Package Referense](#installnugetpackage)
+        - [PackageReference (MSBuild)](#installmsbuild)
   	- [Insatllers](#installers)
   		- [Major Installer](#majorinstaller)
   	   		- [Creating the Main Installer](#majorinstallercreating)
@@ -44,6 +49,26 @@ This documentation provides an overview of the DI (Dependency Injection) Contain
   	  	- [ResolveAll](#resolveall)
 
 
+# Installation 
+In order to use the JsContainer library in your project, you can easily install it via NuGet. This chapter will guide you through the process of installing the JsContainer NuGet package using various package managers.
+## <a id="installcli"/> Using .NET CLI
+To install the JsContainer NuGet package using the .NET CLI, open the command-line interface and execute the following command:
+```c#
+dotnet add package JsContainer --version 1.0.0
+```
+This command will add the JsContainer package with the specified version to your project.
+## <a id="installnugetpackage"/> Using NuGet Package Manager Console
+If you prefer using the NuGet Package Manager Console, you can execute the following command:
+```c#
+Install-Package JsContainer -Version 1.0.0
+```
+Running this command will install the JsContainer package with the specified version into your project.
+## <a id="installmsbuild"/> Using PackageReference (MSBuild)
+For projects that use MSBuild and PackageReference format, you can add the following line to your project file:
+```c#
+<PackageReference Include="JsContainer" Version="1.0.0" />
+```
+This configuration will ensure that the JsContainer package with the specified version is installed in your project.
 
 # <a id="installers"/> Installers
 ## <a id="majorinstaller"/> Major Installer
