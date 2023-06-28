@@ -16,3 +16,5 @@ TestFramework/
 JSContainer/bin/
 
 JSContainer/obj/
+
+.idea/
