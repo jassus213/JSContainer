@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using JSContainer.Binding.BindInfo;
 using JSContainer.DiFactories;
@@ -15,9 +13,9 @@ namespace JSContainer.Services
             BindInformation bindInformation)
         {
             var baseMethod = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic).First(x =>
-                x.GetGenericArguments().Length - 1 == bindInformation.ParameterExpressions.Count);
+                x.GetGenericArguments().Length - 1 == bindInformation.Parameters.Count);
             var genericMethod = baseMethod.MakeGenericMethod(InstanceUtil.GenericParameters
-                .GenericArgumentsMap(instanceType, bindInformation.ParameterExpressions.Values)
+                .GenericArgumentsMap(instanceType, bindInformation.Parameters.Values)
                 .ToArray());
             var instance = genericMethod.Invoke(diContainer,
                 new object[]
@@ -32,11 +30,11 @@ namespace JSContainer.Services
         {
             var baseMethods = typeof(InstanceFactory).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
             var currentMethod = baseMethods.First(x =>
-                x.GetGenericArguments().Length - 1 == container.BindInfoMap[currentType].ParameterExpressions.Count &&
+                x.GetGenericArguments().Length - 1 == container.BindInfoMap[currentType].Parameters.Count &&
                 x.Name == "CreateInstance");
             var genericMethod =
                 currentMethod.MakeGenericMethod(InstanceUtil.GenericParameters.GenericArgumentsMap(currentType,
-                    container.BindInfoMap[currentType].ParameterExpressions.Values).ToArray());
+                    container.BindInfoMap[currentType].Parameters.Values).ToArray());
             return genericMethod;
         }
     }

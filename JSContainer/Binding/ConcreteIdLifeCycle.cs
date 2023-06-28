@@ -16,17 +16,17 @@ namespace JSContainer.Binding
         
         public void AsSingleton()
         {
-            _diContainer.BindInfoMap[typeof(TConcrete)].LifeCycle = LifeCycle.Singleton;
+            _diContainer.BindInfoMap[typeof(TConcrete)].LifeTime = LifeTime.Singleton;
         }
 
         public void AsTransient()
         {
-            _diContainer.BindInfoMap[typeof(TConcrete)].LifeCycle = LifeCycle.Transient;
+            _diContainer.BindInfoMap[typeof(TConcrete)].LifeTime = LifeTime.Transient;
         }
 
         public void AsScoped()
         {
-            _diContainer.BindInfoMap[typeof(TConcrete)].LifeCycle = LifeCycle.Scoped;
+            _diContainer.BindInfoMap[typeof(TConcrete)].LifeTime = LifeTime.Scoped;
         }
     }
 }

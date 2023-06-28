@@ -9,10 +9,9 @@ namespace JSContainer.Binding.BindInfo
     public class BindInformation
     {
         internal readonly DiContainer CurrentContainer;
-        internal LifeCycle LifeCycle;
-        internal Dictionary<Type, ParameterExpression> ParameterExpressions => _parameterExpressions;
-        private readonly Dictionary<Type, ParameterExpression> _parameterExpressions = new Dictionary<Type, ParameterExpression>();
-        internal readonly InstanceType InstanceType;
+        internal LifeTime LifeTime;
+        internal Dictionary<Type, Type> Parameters => _parameters;
+        private readonly Dictionary<Type, Type> _parameters = new Dictionary<Type, Type>();
         internal List<Type> ContractsTypes => _contractsType;
         private readonly List<Type> _contractsType = new List<Type>();
 
@@ -21,14 +20,13 @@ namespace JSContainer.Binding.BindInfo
         public Dictionary<Type, object> ArgumentsMap => _argumentsMap;
         private Dictionary<Type, object> _argumentsMap = new Dictionary<Type, object>();
 
-        public BindInformation(Type currentType, BindType bindType, InstanceType instanceType, DiContainer currentContainer,
-            LifeCycle lifeCycle)
+        public BindInformation(Type currentType, BindType bindType, DiContainer currentContainer,
+            LifeTime lifeTime)
         {
             CurrentType = currentType;
             _bindType = bindType;
-            InstanceType = instanceType;
             CurrentContainer = currentContainer;
-            LifeCycle = lifeCycle;
+            LifeTime = lifeTime;
             Initialize();
         }
 

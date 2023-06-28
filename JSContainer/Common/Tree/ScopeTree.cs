@@ -14,14 +14,14 @@ namespace JSContainer.Common.Tree
         {
             LinkedList.Add(parrentType);
 
-            foreach (var parameterExpression in container.BindInfoMap[parrentType].ParameterExpressions)
+            foreach (var parameterExpression in container.BindInfoMap[parrentType].Parameters)
             {
                 var type = parameterExpression.Key;
                 LinkedList.Add(parameterExpression.Key);
                 if (parameterExpression.Key.IsInterface)
                     type = container.ContractsInfo[type].Last();
                 
-                LinkedList.AddRange(container.BindInfoMap[type].ParameterExpressions.Keys);
+                LinkedList.AddRange(container.BindInfoMap[type].Parameters.Keys);
             }
         }
 

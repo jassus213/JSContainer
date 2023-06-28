@@ -4,7 +4,6 @@ using System.Linq;
 using JSContainer.Binding.BindInfo;
 using JSContainer.Common.Enums;
 using JSContainer.Common.TypeInstancePair;
-using LifeCycle = JSContainer.Common.Enums.LifeCycle;
 
 namespace JSContainer.Binding
 {
@@ -58,8 +57,8 @@ namespace JSContainer.Binding
         public ConcreteIdLifeCycle<TContract> FromResolve(object instance, BindType bindType = BindType.Default)
         {
             var type = instance.GetType();
-            DiContainer.InitializeFromResolve(type, bindType, new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance)),
-                LifeCycle.Default);
+            DiContainer.InitializeFromResolve(type, bindType, (true, TypeInstancePairFactory.CreatePair(instance)),
+                LifeTime.Default);
             return new ConcreteIdLifeCycle<TContract>(DiContainer);
         }
     }

@@ -46,8 +46,7 @@
       <Compile Include="Binding\LifeCycleExtension.cs" />
       <Compile Include="Binding\FactoryConcreteIdBinder.cs" />
       <Compile Include="Common\Enums\BindType.cs" />
-      <Compile Include="Common\Enums\InstanceType.cs" />
-      <Compile Include="Common\Enums\LifeCycle.cs" />
+      <Compile Include="Common\Enums\LifeTime.cs" />
       <Compile Include="Common\InjectAttribute.cs" />
       <Compile Include="Common\Tree\ScopeTree.cs" />
       <Compile Include="Common\Tree\TreeFactory.cs" />

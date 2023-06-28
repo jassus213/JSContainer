@@ -8,7 +8,7 @@ namespace JSContainer.Common.Tree
     {
         internal static void InitializeTree(DiContainer container, Type typeConcrete)
         {
-            foreach (var parameterExpression in container.BindInfoMap[typeConcrete].ParameterExpressions)
+            foreach (var parameterExpression in container.BindInfoMap[typeConcrete].Parameters)
             {
                 var currentTypeExpression = parameterExpression.Key;
 
@@ -18,7 +18,7 @@ namespace JSContainer.Common.Tree
 
                 var keyValuePair = container.ScopedTree.FirstOrDefault(x => x.Key.Contains(typeConcrete));
 
-                if (container.BindInfoMap[currentTypeExpression].LifeCycle == LifeCycle.Scoped &&
+                if (container.BindInfoMap[currentTypeExpression].LifeTime == LifeTime.Scoped &&
                     keyValuePair.Value == null)
                 {
                     var tree = TreeFactory.CreateTree(container, typeConcrete);

@@ -11,11 +11,11 @@ namespace JSContainer
     public static class DiContainerManagerExtensions
     {
         internal static void InitializeBindInfo(this DiContainer currentContainer, Type type, BindInformation bindInformation,
-            KeyValuePair<bool, TypeInstancePair> keyValuePair)
+            (bool IsCreated, TypeInstancePair TypeInstancePair) tuple)
         {
             if (!currentContainer.ContainerInfo.ContainsKey(type) && !type.IsInterface)
             {
-                currentContainer.ContainerInfo.Add(type, keyValuePair);
+                currentContainer.ContainerInfo.Add(type, tuple);
                 currentContainer.BindInfoMap.Add(type, bindInformation);
                 return;
             }
@@ -24,33 +24,26 @@ namespace JSContainer
         }
 
         internal static void InitializeFromResolve(this DiContainer currentContainer, Type type, BindType bindType,
-            KeyValuePair<bool, TypeInstancePair> keyValuePair, LifeCycle lifeCycle)
+            (bool IsCreated, TypeInstancePair TypeInstancePair) tuple, LifeTime lifeTime)
         {
-            var bindInfo = BindInfoFactory.Create(type, bindType, InstanceType.Default, currentContainer, lifeCycle);
-            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, keyValuePair);
+            var bindInfo = BindInfoFactory.Create(type, bindType, currentContainer, lifeTime);
+            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, tuple);
             RewriteBindInfo(ref currentContainer.BindInfoMap, type, bindInfo);
         }
 
         internal static void ReWriteInstanceInfo(this DiContainer currentContainer, Type type, BindInformation bindInformation,
-            KeyValuePair<bool, TypeInstancePair> keyValuePair)
+            (bool IsCreated, TypeInstancePair TypeInstancePair) tuple)
         {
-            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, keyValuePair);
+            RewriteContainerInfo(ref currentContainer.ContainerInfo, type, tuple);
             RewriteBindInfo(ref currentContainer.BindInfoMap, type, bindInformation);
         }
-
-        internal static void InitializeFactoryInfoMap(this DiContainer container, Type type,
-            FactoryBindInfo factoryBindInfo)
-        {
-            container.FactoryBindInfoMap.Add(type, factoryBindInfo);
-        }
-
-        internal static BindInformation GetBindInfo(this DiContainer container, Type type, BindType bindType,
-            InstanceType instanceType, LifeCycle lifeCycle)
+        
+        internal static BindInformation GetBindInfo(this DiContainer container, Type type, BindType bindType, LifeTime lifeTime)
         {
             if (container.BindInfoMap.ContainsKey(type))
                 return container.BindInfoMap[type];
 
-            return BindInfoFactory.Create(type, bindType, instanceType, container, lifeCycle);
+            return BindInfoFactory.Create(type, bindType, container, lifeTime);
         }
 
         private static void RewriteBindInfo(ref Dictionary<Type, BindInformation> bindInformationMap, Type type, BindInformation bindInformation)
@@ -63,15 +56,15 @@ namespace JSContainer
             bindInformationMap[type] = bindInformation;
         }
 
-        private static void RewriteContainerInfo(ref Dictionary<Type, KeyValuePair<bool, TypeInstancePair>> containerInfo, Type type,
-            KeyValuePair<bool, TypeInstancePair> keyValuePair)
+        private static void RewriteContainerInfo(ref Dictionary<Type, (bool IsCreated, TypeInstancePair TypeInstancePair)> containerInfo, Type type,
+            (bool IsCreated, TypeInstancePair TypeInstancePair) tuple)
         {
             if (!containerInfo.ContainsKey(type))
             {
                 throw JsExceptions.BindException.NotBindedException(type);
             }
 
-            containerInfo[type] = keyValuePair;
+            containerInfo[type] = tuple;
         }
     }
 }

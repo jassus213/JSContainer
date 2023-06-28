@@ -1,28 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.Serialization;
 using JSContainer.Binding;
 using JSContainer.Binding.BindInfo;
 using JSContainer.Common.Enums;
 using JSContainer.Common.Tree;
 using JSContainer.Common.TypeInstancePair;
 using JSContainer.Contracts;
-using JSContainer.Factories;
 using JSContainer.JSExceptions;
 using JSContainer.Services;
-using JSContainer.Common;
-using JSContainer.Utils.Instance;
 
 namespace JSContainer
 {
-    public class DiContainer : IContainer
+    public class DiContainer : IContainer 
     {
-        internal Dictionary<Type, KeyValuePair<bool, TypeInstancePair>> ContainerInfo =
-            new Dictionary<Type, KeyValuePair<bool, TypeInstancePair>>();
+        internal Dictionary<Type, (bool IsCreated, TypeInstancePair TypeInstancePair)> ContainerInfo =
+            new Dictionary<Type, (bool, TypeInstancePair)>();
 
         internal Dictionary<Type, IEnumerable<Type>> ContractsInfo = new Dictionary<Type, IEnumerable<Type>>();
 
@@ -31,64 +24,44 @@ namespace JSContainer
 
         internal Dictionary<Type, BindInformation> BindInfoMap = new Dictionary<Type, BindInformation>();
 
-        internal readonly Dictionary<Type, FactoryBindInfo>
-            FactoryBindInfoMap = new Dictionary<Type, FactoryBindInfo>();
-
-        internal readonly LinkedList<KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>> BindQueue =
-            new LinkedList<KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>>();
-
-        private readonly IReadOnlyDictionary<InstanceType, Func<Type, BindInformation, object>> _instanceFactoryMap;
-
-        public DiContainer()
-        {
-            _instanceFactoryMap = new Dictionary<InstanceType, Func<Type, BindInformation, object>>()
-            {
-                [InstanceType.Default] = (type, bindInfo) =>
-                    InstanceFactoryService.FindAndInvokeMethod(this, type, bindInfo),
-                [InstanceType.Factory] = (type, bindInfo) =>
-                    InstanceFactoryService.FindAndInvokeMethod(this, type, bindInfo),
-            };
-        }
+        internal readonly LinkedList<KeyValuePair<Type, (bool IsCreated, TypeInstancePair TypeInstancePair)>>
+            BindQueue =
+                new LinkedList<KeyValuePair<Type, (bool, TypeInstancePair)>>();
 
 
         public void Initialize()
         {
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-
             SortQueue();
 
             foreach (var keyValuePair in BindQueue)
             {
-                if (!ContainerInfo[keyValuePair.Key].Key)
+                if (!ContainerInfo[keyValuePair.Key].IsCreated)
                 {
-                    var method = _instanceFactoryMap[BindInfoMap[keyValuePair.Key].InstanceType];
-                    var instance = method.Invoke(keyValuePair.Key, BindInfoMap[keyValuePair.Key]);
+                    var type = keyValuePair.Value.TypeInstancePair.Type;
+                    var method = InstanceFactoryService.FindAndInvokeMethod(this, type, BindInfoMap[type]);
                 }
             }
 
             BindQueue.Clear();
-            stopwatch.Stop();
-            var test = stopwatch.Elapsed.TotalSeconds.ToString();
         }
+
 
         private void SortQueue()
         {
             foreach (var instanceInfo in ContainerInfo)
             {
-                if (!instanceInfo.Value.Key)
+                if (!instanceInfo.Value.IsCreated)
                 {
                     var isExist = BindInfoMap.Values.ToArray()
-                        .Select(x => x.ParameterExpressions.ContainsKey(instanceInfo.Key));
+                        .Select(x => x.Parameters.ContainsKey(instanceInfo.Key));
+
+                    var tuple = new KeyValuePair<Type, (bool IsCreated, TypeInstancePair TypeInstancePair)>(
+                        instanceInfo.Key, instanceInfo.Value);
 
                     if (!isExist.Contains(true))
-                        BindQueue.AddFirst(
-                            new KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>(instanceInfo.Key,
-                                instanceInfo.Value));
+                        BindQueue.AddFirst(tuple);
                     else
-                        BindQueue.AddLast(
-                            new KeyValuePair<Type, KeyValuePair<bool, TypeInstancePair>>(instanceInfo.Key,
-                                instanceInfo.Value));
+                        BindQueue.AddLast(tuple);
                 }
             }
         }
@@ -97,8 +70,8 @@ namespace JSContainer
         {
             var type = typeof(TContract);
             var containerInfo = ContainerInfo[type];
-            if (containerInfo.Key)
-                return (TContract)containerInfo.Value.Instance;
+            if (containerInfo.IsCreated)
+                return (TContract)containerInfo.TypeInstancePair.Instance;
 
             throw JsExceptions.ResolveException.DoesntExistException(type);
         }
@@ -107,7 +80,7 @@ namespace JSContainer
         {
             var instancesTypes = ContractsInfo[typeof(TContract)].ToList();
             var instances = instancesTypes
-                .Select(x => (TContract)ContainerInfo[x].Value.Instance).ToArray();
+                .Select(x => (TContract)ContainerInfo[x].TypeInstancePair.Instance).ToArray();
             return instances;
         }
 
@@ -115,50 +88,47 @@ namespace JSContainer
         {
             if (!typeof(TContract).IsInterface)
                 this.InitializeBindInfo(typeof(TContract), bindInformation,
-                    new KeyValuePair<bool, TypeInstancePair>(false,
-                        TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
+                    (false, TypeInstancePairFactory.CreatePairWithCurrentType(typeof(TContract), null)));
             return ConcreteBindersFactory.Create<TContract>(this, bindInformation);
         }
 
         public ConcreteIdBinder<TContract> Bind<TContract>()
         {
             var type = typeof(TContract);
-            var bindInfo = this.GetBindInfo(type, BindType.Default, InstanceType.Default, LifeCycle.Default);
+            var bindInfo = this.GetBindInfo(type, BindType.Default, LifeTime.Default);
             return Bind<TContract>(bindInfo);
         }
 
         public ConcreteIdBinder<TContract> BindInterfacesTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInformation = this.GetBindInfo(type, BindType.InterfacesTo, InstanceType.Default, LifeCycle.Default);
+            var bindInformation =
+                this.GetBindInfo(type, BindType.InterfacesTo, LifeTime.Default);
             return Bind<TContract>(bindInformation);
         }
 
         public ConcreteIdBinder<TContract> BindSelfTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInformation = this.GetBindInfo(type, BindType.SelfTo, InstanceType.Default, LifeCycle.Default);
+            var bindInformation = this.GetBindInfo(type, BindType.SelfTo, LifeTime.Default);
             return Bind<TContract>(bindInformation);
         }
 
         public ConcreteIdBinder<TContract> BindInterfacesAndSelfTo<TContract>()
         {
             var type = typeof(TContract);
-            var bindInformation = this.GetBindInfo(type, BindType.InterfacesAndSelfTo, InstanceType.Default,
-                LifeCycle.Default);
+            var bindInformation = this.GetBindInfo(type, BindType.InterfacesAndSelfTo, LifeTime.Default);
             return Bind<TContract>(bindInformation);
         }
 
-        public FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>() where TFactory : IFactory
+        /*public FactoryConcreteBinderId<TFactory> BindFactory<TFactory, TResult>() where TFactory : IFactory
         {
             var factoryType = typeof(TFactory);
             var resultType = typeof(TResult);
-            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, InstanceType.Factory,
-                LifeCycle.Default);
+            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, LifeCycle.Default);
             var factoryBindInfo = new FactoryBindInfo(factoryType, resultType, false, 2);
             this.InitializeBindInfo(factoryType, bindInfo,
-                new KeyValuePair<bool, TypeInstancePair>(false,
-                    TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
+                (false, TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
             return BindFactory<TFactory>(factoryBindInfo);
         }
 
@@ -167,12 +137,10 @@ namespace JSContainer
         {
             var factoryType = typeof(TFactory);
             var resultType = typeof(TResult);
-            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, InstanceType.Factory,
-                LifeCycle.Default);
+            var bindInfo = this.GetBindInfo(factoryType, BindType.InterfacesAndSelfTo, LifeCycle.Default);
             var factoryBindInfo = new FactoryBindInfo(factoryType, resultType, true, 3, typeof(TArgs));
             this.InitializeBindInfo(factoryType, bindInfo,
-                new KeyValuePair<bool, TypeInstancePair>(false,
-                    TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
+                (false, TypeInstancePairFactory.CreatePairWithCurrentType(null, null)));
             return BindFactory<TFactory>(factoryBindInfo);
         }
 
@@ -181,13 +149,14 @@ namespace JSContainer
             this.InitializeFactoryInfoMap(factoryBindInfo.FactoryType, factoryBindInfo);
             return new FactoryConcreteBinderId<TFactory>(this, factoryBindInfo);
         }
+        */
 
         public object InitializeWithOutOrder<TConcrete>()
         {
             var instance = InstanceFactoryService.FindAndInvokeMethod(this, typeof(TConcrete),
                 BindInfoMap[typeof(TConcrete)]);
-            var pair = new KeyValuePair<bool, TypeInstancePair>(true, TypeInstancePairFactory.CreatePair(instance));
-            this.ReWriteInstanceInfo(typeof(TConcrete), BindInfoMap[typeof(TConcrete)], pair);
+            var tuple =(true, TypeInstancePairFactory.CreatePair(instance));
+            this.ReWriteInstanceInfo(typeof(TConcrete), BindInfoMap[typeof(TConcrete)], tuple);
             return instance;
         }
     }

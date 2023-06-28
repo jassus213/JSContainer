@@ -11,11 +11,11 @@ namespace JSContainer.Binding.BindInfo
     public static class BindInfoExtension
     {
         internal static void AddParameterExpressions(this BindInformation bindInformation,
-            IReadOnlyCollection<ParameterExpression> parameterExpressions)
+            IReadOnlyCollection<Type> parameterExpressions)
         {
             foreach (var parameter in parameterExpressions)
             {
-                bindInformation.ParameterExpressions.Add(parameter.Type, parameter);
+                bindInformation.Parameters.Add(parameter, parameter);
             }
         }
 
@@ -26,13 +26,13 @@ namespace JSContainer.Binding.BindInfo
 
         internal static void AddArguments(this BindInformation bindInformation, IReadOnlyCollection<object> arguments)
         {
-            if (arguments.Count > bindInformation.ParameterExpressions.Count)
+            if (arguments.Count > bindInformation.Parameters.Count)
                 JsExceptions.ConstructorException.IsWrongParamsCountException(bindInformation.CurrentType,
-                    bindInformation.ParameterExpressions.Count);
+                    bindInformation.Parameters.Count);
 
             var argumentsTypes = arguments.Select(x => x.GetType()).ToArray();
 
-            foreach (var parameter in bindInformation.ParameterExpressions)
+            foreach (var parameter in bindInformation.Parameters)
             {
                 var parameterType = parameter.Key;
 

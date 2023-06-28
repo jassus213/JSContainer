@@ -20,21 +20,12 @@ namespace JSContainer.Utils.LifeCycle
             return false;
         }
 
-        /*internal static object FindScopeInstance(this DiContainer container, Type scopeType, Type parentType)
-        {
-            /*var tree = container.ScopedTree[parentType];
-            if (tree.ScopeInstance is null)
-                return null;
-
-            return tree.ScopeInstance;#1#
-        }*/
-
         internal static bool IsSingletonInstanced(this DiContainer container, Type currentType)
         {
             if (!container.ContainerInfo.ContainsKey(currentType))
                 throw JsExceptions.BindException.NotBindedException(currentType);
 
-            return container.ContainerInfo[currentType].Key;
+            return container.ContainerInfo[currentType].IsCreated;
         }
     }
 }

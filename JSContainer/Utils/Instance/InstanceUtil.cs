@@ -62,7 +62,7 @@ namespace JSContainer.Utils.Instance
                         paramType = container.ContractsInfo[paramType].Last();
                     }
 
-                    var parametersOfParam = container.BindInfoMap[paramType].ParameterExpressions.Keys;
+                    var parametersOfParam = container.BindInfoMap[paramType].Parameters.Keys;
                     if (parametersOfParam.Count(x => x == instanceType) != 0)
                     {
                         throw JsExceptions.BindException.CircularDependency(instanceType, paramType);
@@ -114,6 +114,15 @@ namespace JSContainer.Utils.Instance
                 var parameters = parametersInfo.Select(x => x.ParameterType);
                 return GetParametersExpression(parameters.ToArray());
             }
+            
+            internal static IEnumerable<Type> GetParameters(Type type, Type[] contractTypes,
+                CallingConventions callingConventions = default)
+            {
+                var parameterInfos = type.GetConstructor(BindingFlags.Default, null,
+                    callingConventions, contractTypes, null)?.GetParameters();
+
+                return parameterInfos!.Select(x => x.ParameterType);
+            }
 
             internal static IReadOnlyCollection<ParameterExpression> GetParametersExpression(
                 Type[] requiredParameters)
@@ -134,9 +143,9 @@ namespace JSContainer.Utils.Instance
         internal static class GenericParameters
         {
             internal static IReadOnlyCollection<Type> GenericArgumentsMap(Type type,
-                IEnumerable<ParameterExpression> arguments)
+                IEnumerable<Type> arguments)
             {
-                var result = arguments.Select(x => x.Type).ToList();
+                var result = arguments.ToList();
 
                 result.Add(type);
                 return result.ToArray();

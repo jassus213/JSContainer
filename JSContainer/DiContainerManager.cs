@@ -47,11 +47,11 @@ namespace JSContainer
 
 
             if (InstanceUtil.ParametersUtil.HasCircularDependency(container, type,
-                    container.BindInfoMap[currentType].ParameterExpressions.Keys.ToList()))
+                    container.BindInfoMap[currentType].Parameters.Keys.ToList()))
                 return null;
 
 
-            if (bindInformation!.LifeCycle == LifeCycle.Singleton)
+            if (bindInformation!.LifeTime == LifeTime.Singleton)
             {
                 if (!container.IsSingletonInstanced(currentType))
                 {
@@ -67,11 +67,11 @@ namespace JSContainer
                     return instance;
                 }
 
-                return container.ContainerInfo[currentType].Value.Instance;
+                return container.ContainerInfo[currentType].TypeInstancePair.Instance;
             }
 
 
-            if (bindInformation!.LifeCycle == LifeCycle.Scoped)
+            if (bindInformation!.LifeTime == LifeTime.Scoped)
             {
                 var keyValuePair = container.ScopedTree.First(x => x.Key.Contains(typeConcrete));
                 var scopeTree = keyValuePair.Value;
@@ -95,7 +95,7 @@ namespace JSContainer
             }
 
 
-            if (bindInformation!.LifeCycle == LifeCycle.Transient)
+            if (bindInformation!.LifeTime == LifeTime.Transient)
             {
                 var genericMethod = InstanceFactoryService.FindMethod(container, currentType);
                 var obj = genericMethod.Invoke(null,

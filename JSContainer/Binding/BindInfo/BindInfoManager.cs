@@ -12,10 +12,8 @@ namespace JSContainer.Binding.BindInfo
         {
             var type = bindInformation.CurrentType;
             var constructor = InstanceUtil.ConstructorUtils.GetConstructor(type, ConstructorConventionsSequence.First);
-            var parameters =
-                InstanceUtil.ParametersUtil.GetParametersExpression(constructor.GetParameters()
-                    .Select(x => x.ParameterType).ToArray());
-            bindInformation.AddParameterExpressions(parameters);
+            var parameters = constructor.GetParameters();
+            bindInformation.AddParameterExpressions(parameters.Select(x => x.ParameterType).ToArray());
         }
 
         internal static void BindSelfTo(this BindInformation bindInformation)
@@ -39,10 +37,9 @@ namespace JSContainer.Binding.BindInfo
                     else
                         contractsType.Add(contract, new[] { bindInformation.CurrentType });
                 }
-                
+
                 bindInformation.AddContracts(contracts);
             }
-            
         }
 
         internal static void BindInterfacesAndSelfTo(this BindInformation bindInformation,

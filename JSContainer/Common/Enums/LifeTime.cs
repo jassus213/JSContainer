@@ -1,6 +1,6 @@
 namespace JSContainer.Common.Enums
 {
-    public enum LifeCycle
+    public enum LifeTime
     {
         Default = 0,
         Singleton = 1,
