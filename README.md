@@ -1,7 +1,11 @@
 # JS Container Documentation
 ## Introduction
 This documentation provides an overview of the DI (Dependency Injection) Container, its functionality, and how to use it effectively in your application. The DI Container simplifies the management and resolution of dependencies within your codebase.
-### Last Version : 1.0.0
+
+![Last Version : 1.0.0](https://img.shields.io/badge/release-1.0.0-green) 
+![Last Coomit : June 2023](https://img.shields.io/badge/last_commit-june_2023-blue) 
+![GitHub](https://img.shields.io/github/license/svermeulen/Extenject)
+
 
 
 ## Map
